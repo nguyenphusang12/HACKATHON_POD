@@ -13,7 +13,9 @@ const Layout = () => {
           Thiết kế mẫu áo của bạn
         </div>
       </div>
-      <Outlet />
+      <div className="mt-4">
+        <Outlet />
+      </div>
     </div>
   );
 };
