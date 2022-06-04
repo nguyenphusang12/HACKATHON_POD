@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Transformer } from "react-konva";
 import ItemMenu from "Components/ItemMenu";
+import ArkworkImage from "Components/KonvaObject/ArkworkImage";
 import shirtIcon from "assets/image/Shape.png";
 import textIcon from "assets/image/Shape_3.png";
 import layoutIcon from "assets/image/Union.png";
@@ -9,64 +10,7 @@ import uploadIcon from "assets/image/Shape_4.png";
 import downloadIcon from "assets/image/Shape_5.png";
 import DetailMenu from "Components/DetailMenu";
 import { CirclePicker } from 'react-color';
-
-const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
-  const shapeRef = React.useRef();
-  const trRef = React.useRef();
-  
-  React.useEffect(() => {
-    if (isSelected) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
-
-  return (
-    <React.Fragment>
-      <Rect
-        onClick={onSelect}
-        onTap={onSelect}
-        ref={shapeRef}
-        {...shapeProps}
-        draggable
-        onDragEnd={(e) => {
-          onChange({
-            ...shapeProps,
-            x: e.target.x(),
-            y: e.target.y(),
-          });
-        }}
-        onTransformEnd={(e) => {
-          const node = shapeRef.current;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-          node.scaleX(1);
-          node.scaleY(1);
-          onChange({
-            ...shapeProps,
-            x: node.x(),
-            y: node.y(),
-            // set minimal value
-            width: Math.max(5, node.width() * scaleX),
-            height: Math.max(node.height() * scaleY),
-          });
-        }}
-      />
-      {isSelected && (
-        <Transformer
-          ref={trRef}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (newBox.width < 5 || newBox.height < 5) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-        />
-      )}
-    </React.Fragment>
-  );
-};
-
+import html2canvas from "html2canvas";
 const initialRectangles = [
   {
     x: 150,
@@ -94,7 +38,7 @@ const LIST_BUTTONS_CONTROL = [
   },
   {
     id: 2,
-    title: "Màu áo",
+    title: "Chất liệu và màu sắc",
     isShow: false,
     icon: colorIcon,
   },
@@ -130,6 +74,7 @@ const Home = () => {
   const [height, setHeight] = useState(685);
   const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
+  const [listImage, setListImage] = useState([]);
 
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
@@ -146,15 +91,46 @@ const Home = () => {
       return item.id === id;
     });
   };
-  const imageObj = new Image();
-  imageObj.src = "../../assets/artwork/1067.png"
+
+  useEffect(() => {
+    let images = []
+    for (var i=1067; i<1069; i++) {
+      const imageObj = new Image();
+      imageObj.src = `../../assets/artwork/${i}.png`
+      images.push({id: i, image: imageObj, width: 150, height: 150, x: 200, y: 300})
+    }
+    setListImage(images);
+  }, [])
+ 
   const handleChangeColor = (color) => {
-    console.log(color);
-    setColor(color.hex);
+      setColor(color.hex);
+  };
+
+  const handleDownload = () => {
+    console.log("test")
+    html2canvas(document.querySelector("#design-container")).then(canvas => {
+      const image = canvas.toDataURL("image/png", 1.0)
+      downloadImage(image, "design")
+  });
+};
+
+const downloadImage = (blob, fileName) => {
+    const fakeLink = window.document.createElement("a");
+    fakeLink.style = "display:none;";
+    fakeLink.download = fileName;
+    
+    fakeLink.href = blob;
+    
+    document.body.appendChild(fakeLink);
+    fakeLink.click();
+    document.body.removeChild(fakeLink);
+    
+    fakeLink.remove();
   };
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
+
         <div className="w-11/12 mx-auto px-2">
           {listButtons.map((item, index) => (
             <>
@@ -165,17 +141,15 @@ const Home = () => {
                 handleClickMenu={handleClickMenu}
                 item={item}
               />
-              {item.isShow && <DetailMenu />}
+              {item.isShow && <DetailMenu item={item}/>}
             </>
           ))}
         </div>
       </div>
-      <img src={imageObj.src} className="object-cover" style={{ width: 100, height: 100 }} alt="test"></img>
-      <CirclePicker colors={["red", "blue"]} onChangeComplete={handleChangeColor}></CirclePicker>
-      <div className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500 relative">
-         <div style={{ width: '100%', height: 610, position: "relative"}}>
-            <div className="" style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: color}}></div>
-            <img className="object-cover" style={{position: 'absolute', top: 0, left: 0, width: width, height: 'auto' }} src="assets/ao3.png"/>
+      <div id="design-container" className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500 relative">
+
+         <div style={{ width: '100%'}}>
+            <img className="object-cover" alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
         </div>
         <Stage
           width={window.innerWidth}
@@ -202,13 +176,28 @@ const Home = () => {
                 />
               );
             })} */}
-            <Image>
-              
-            </Image>
+            {listImage.map((image, i) => {
+              return (<ArkworkImage
+              key={i}
+              shapeProps={image}
+              isSelected={image.id === selectedId}
+              onSelect={() => {
+                selectShape(image.id);
+              }}
+            onChange={(newAttrs) => {
+              const images = listImage.slice();
+              images[i] = newAttrs;
+              setListImage(images);
+            }}
+            />)
+            })}
+            
           </Layer>
         </Stage>
       </div>
       <div className="w-1/4 px-3">
+      <CirclePicker colors={["red", "blue"]} onChangeComplete={handleChangeColor}></CirclePicker>
+
         <div className="text-left w-full h-4/5 px-3">
           <h2 className="text-lg text-center font-bold p-2">Thuộc tính áo</h2>
           <hr />
