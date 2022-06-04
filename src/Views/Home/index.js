@@ -8,6 +8,7 @@ import colorIcon from "assets/image/Shape_1.png";
 import uploadIcon from "assets/image/Shape_4.png";
 import downloadIcon from "assets/image/Shape_5.png";
 import DetailMenu from "Components/DetailMenu";
+import { CirclePicker } from 'react-color';
 
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
   const shapeRef = React.useRef();
@@ -127,7 +128,7 @@ const Home = () => {
   const [selectedId, selectShape] = React.useState(null);
   const [width, setWidth] = useState(700);
   const [height, setHeight] = useState(685);
-
+  const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
 
   const checkDeselect = (e) => {
@@ -145,9 +146,14 @@ const Home = () => {
       return item.id === id;
     });
   };
+
+  const handleChangeColor = (color) => {
+      setColor(color.hex);
+  };
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
+
         <div className="w-11/12 mx-auto px-2">
           {listButtons.map((item, index) => (
             <>
@@ -163,14 +169,15 @@ const Home = () => {
           ))}
         </div>
       </div>
-      <div className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500">
-         <div style={{ width: '100%', height: 610, position: "relative"}}>
-            <div className="" style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: "red"}}></div>
-            <img className="object-cover" alt="" style={{position: 'absolute', top: 0, left: 0, width: width, height: 'auto' }} src="assets/ao3.png"/>
+      <div className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500 relative">
+
+         <div style={{ width: '100%'}}>
+            <img className="object-cover" alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
         </div>
-        {/* <Stage
+        <Stage
           width={window.innerWidth}
           height={window.innerHeight}
+          style={{ position: "absolute", top: 0, left: 0 }}
           onMouseDown={checkDeselect}
           onTouchStart={checkDeselect}
         >
@@ -193,9 +200,11 @@ const Home = () => {
               );
             })}
           </Layer>
-        </Stage> */}
+        </Stage>
       </div>
       <div className="w-1/4 px-3">
+      <CirclePicker colors={["red", "blue"]} onChangeComplete={handleChangeColor}></CirclePicker>
+
         <div className="text-left w-full h-4/5 px-3">
           <h2 className="text-lg text-center font-bold p-2">Thuộc tính áo</h2>
           <hr />
@@ -230,3 +239,13 @@ const Home = () => {
 export default Home;
 
 const LIST_SIZE = ["XS", "S", "M", "L", "XXl", "XXXl"];
+const LIST_METERIALS = [
+  {
+    "name": "100% cotton",
+    "color": ["orange", "red", "green", "black", "white"],
+  },
+  {
+    "name": "95% cotton, 5% spandex",
+    "color": ["orange", "red", "black", "white"],
+  }
+] 
