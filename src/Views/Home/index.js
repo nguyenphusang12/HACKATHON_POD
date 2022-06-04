@@ -6,7 +6,6 @@ import textIcon from "assets/image/text.png";
 import layoutIcon from "assets/image/layout.png";
 import colorIcon from "assets/image/color-palette.png";
 
-
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
   const shapeRef = React.useRef();
   const trRef = React.useRef();
@@ -83,13 +82,10 @@ const initialRectangles = [
   },
 ];
 
-
-
 const Home = () => {
-
   const [rectangles, setRectangles] = React.useState(initialRectangles);
   const [selectedId, selectShape] = React.useState(null);
-  
+
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -100,10 +96,10 @@ const Home = () => {
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
-        <div className="w-11/12 mx-auto py-3">
+        <div className="w-11/12 mx-auto px-2">
           <ItemMenu title="Kiểu dáng" icon={shirtIcon} />
           <ItemMenu title="Màu áo" icon={colorIcon} />
-          <ItemMenu title="Mẫu thiết kế" icon={layoutIcon} />
+          <itemItemMenu title="Mẫu thiết kế" icon={layoutIcon} />
           <ItemMenu title="Thêm chữ" icon={textIcon} />
           <ItemMenu title="Undo" icon={shirtIcon} />
           <ItemMenu title="Khôi phục cài đặt" icon={shirtIcon} />
@@ -137,18 +133,38 @@ const Home = () => {
           </Layer>
         </Stage>
       </div>
-      <div className="w-1/4 p-4">
-        <div className="text-left w-full h-4/5 shadow-lg shadow-gray-500 p-3">
+      <div className="w-1/4 px-3">
+        <div className="text-left w-full h-4/5 px-3">
           <h2 className="text-lg text-center font-bold p-2">Thuộc tính áo</h2>
           <hr />
-          <div className="">- Tên sản phẩm: </div>
-          <div className="">- Loại vải: </div>
-          <div className="">- Loại in: </div>
-          <div className=""> Chọn size, số lượng:</div>
+          <div className="py-3">
+            <div className="">- Áo bóng chày </div>
+            <div className="">- Loại vải: 95% cotton, 5% spandex</div>
+            <div className="">- Loại in: DTF / Decal đa sắc</div>
+            <div className="font-bold"> Nhập số lượng áo theo Size:</div>
+            <div className="grid grid-cols-3 gap-4">
+              {LIST_SIZE.map((item, index) => (
+                <div key={index} className="">
+                  <div className="mb-1">{item}</div>
+                  <div className="w-full rounded border-[1px] border-gray-300">
+                    <input
+                      type="text"
+                      name=""
+                      id=""
+                      className="w-full px-1 outline-none"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
+
+const LIST_SIZE = ["XS", "S", "M", "L", "XXl", "XXXl"];
