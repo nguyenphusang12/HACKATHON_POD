@@ -8,12 +8,11 @@ import colorIcon from "assets/image/Shape_1.png";
 import uploadIcon from "assets/image/Shape_4.png";
 import downloadIcon from "assets/image/Shape_5.png";
 import DetailMenu from "Components/DetailMenu";
-import { CirclePicker } from 'react-color';
 
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
   const shapeRef = React.useRef();
   const trRef = React.useRef();
-  
+
   React.useEffect(() => {
     if (isSelected) {
       trRef.current.nodes([shapeRef.current]);
@@ -148,12 +147,11 @@ const Home = () => {
   };
 
   const handleChangeColor = (color) => {
-      setColor(color.hex);
+    setColor(color.hex);
   };
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
-
         <div className="w-11/12 mx-auto px-2">
           {listButtons.map((item, index) => (
             <>
@@ -164,15 +162,19 @@ const Home = () => {
                 handleClickMenu={handleClickMenu}
                 item={item}
               />
-              {item.isShow && <DetailMenu item={item}/>}
+              {item.isShow && <DetailMenu item={item} setColor={setColor}/>}
             </>
           ))}
         </div>
       </div>
       <div className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500 relative">
-
-         <div style={{ width: '100%'}}>
-            <img className="object-cover" alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
+        <div style={{ width: "100%" }}>
+          <img
+            className="object-cover"
+            alt=""
+            style={{ top: 0, left: 0, width: width, background: color }}
+            src="assets/ao3.png"
+          />
         </div>
         <Stage
           width={window.innerWidth}
@@ -203,8 +205,6 @@ const Home = () => {
         </Stage>
       </div>
       <div className="w-1/4 px-3">
-      <CirclePicker colors={["red", "blue"]} onChangeComplete={handleChangeColor}></CirclePicker>
-
         <div className="text-left w-full h-4/5 px-3">
           <h2 className="text-lg text-center font-bold p-2">Thuộc tính áo</h2>
           <hr />
@@ -239,13 +239,4 @@ const Home = () => {
 export default Home;
 
 const LIST_SIZE = ["XS", "S", "M", "L", "XXl", "XXXl"];
-const LIST_METERIALS = [
-  {
-    "name": "100% cotton",
-    "color": ["orange", "red", "green", "black", "white"],
-  },
-  {
-    "name": "95% cotton, 5% spandex",
-    "color": ["orange", "red", "black", "white"],
-  }
-] 
+
