@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Transformer } from "react-konva";
 import ItemMenu from "Components/ItemMenu";
 import shirtIcon from "assets/image/polo-shirt.png";
 import textIcon from "assets/image/text.png";
 import layoutIcon from "assets/image/layout.png";
 import colorIcon from "assets/image/color-palette.png";
+
 
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
   const shapeRef = React.useRef();
@@ -82,10 +83,13 @@ const initialRectangles = [
   },
 ];
 
+
+
 const Home = () => {
+
   const [rectangles, setRectangles] = React.useState(initialRectangles);
   const [selectedId, selectShape] = React.useState(null);
-
+  
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -96,7 +100,7 @@ const Home = () => {
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
-        <div className="w-24 bg-orange-100 py-3">
+        <div className="w-11/12 mx-auto py-3">
           <ItemMenu title="Kiểu dáng" icon={shirtIcon} />
           <ItemMenu title="Màu áo" icon={colorIcon} />
           <ItemMenu title="Mẫu thiết kế" icon={layoutIcon} />
@@ -136,7 +140,7 @@ const Home = () => {
       <div className="w-1/4 p-4">
         <div className="text-left w-full h-4/5 shadow-lg shadow-gray-500 p-3">
           <h2 className="text-lg text-center font-bold p-2">Thuộc tính áo</h2>
-          <hr/>
+          <hr />
           <div className="">- Tên sản phẩm: </div>
           <div className="">- Loại vải: </div>
           <div className="">- Loại in: </div>
@@ -144,7 +148,7 @@ const Home = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
