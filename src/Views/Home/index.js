@@ -146,7 +146,8 @@ const Home = () => {
       return item.id === id;
     });
   };
-
+  const imageObj = new Image();
+  imageObj.src = "../../assets/artwork/1067.png"
   const handleChangeColor = (color) => {
     console.log(color);
     setColor(color.hex);
@@ -169,6 +170,7 @@ const Home = () => {
           ))}
         </div>
       </div>
+      <img src={imageObj.src} className="object-cover" style={{ width: 100, height: 100 }} alt="test"></img>
       <CirclePicker colors={["red", "blue"]} onChangeComplete={handleChangeColor}></CirclePicker>
       <div className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500 relative">
          <div style={{ width: '100%', height: 610, position: "relative"}}>
@@ -183,7 +185,7 @@ const Home = () => {
           onTouchStart={checkDeselect}
         >
           <Layer>
-            {rectangles.map((rect, i) => {
+            {/* {rectangles.map((rect, i) => {
               return (
                 <Rectangle
                   key={i}
@@ -199,7 +201,10 @@ const Home = () => {
                   }}
                 />
               );
-            })}
+            })} */}
+            <Image>
+              
+            </Image>
           </Layer>
         </Stage>
       </div>
