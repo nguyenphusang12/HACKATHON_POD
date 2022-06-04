@@ -75,6 +75,7 @@ const Home = () => {
   const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
   const [listImage, setListImage] = useState([]);
+  const [listImageDesign, setListImageDesign] = useState([]);
 
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
@@ -103,11 +104,10 @@ const Home = () => {
   }, [])
  
   const handleChangeColor = (color) => {
-      setColor(color.hex);
+    setColor(color.hex);
   };
 
   const handleDownload = () => {
-    console.log("test")
     html2canvas(document.querySelector("#design-container")).then(canvas => {
       const image = canvas.toDataURL("image/png", 1.0)
       downloadImage(image, "design")
@@ -130,7 +130,6 @@ const downloadImage = (blob, fileName) => {
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
-
         <div className="w-11/12 mx-auto px-2">
           {listButtons.map((item, index) => (
             <>
@@ -138,10 +137,11 @@ const downloadImage = (blob, fileName) => {
                 key={index}
                 title={item.title}
                 icon={item.icon}
-                handleClickMenu={handleClickMenu}
+                handleClickMenu={index === 5 ? handleDownload : handleClickMenu}
                 item={item}
+                listImage={listImage}
               />
-              {item.isShow && <DetailMenu item={item}/>}
+              {item.isShow && <DetailMenu item={item} setColor={setColor}/>}
             </>
           ))}
         </div>
@@ -159,23 +159,6 @@ const downloadImage = (blob, fileName) => {
           onTouchStart={checkDeselect}
         >
           <Layer>
-            {/* {rectangles.map((rect, i) => {
-              return (
-                <Rectangle
-                  key={i}
-                  shapeProps={rect}
-                  isSelected={rect.id === selectedId}
-                  onSelect={() => {
-                    selectShape(rect.id);
-                  }}
-                  onChange={(newAttrs) => {
-                    const rects = rectangles.slice();
-                    rects[i] = newAttrs;
-                    setRectangles(rects);
-                  }}
-                />
-              );
-            })} */}
             {listImage.map((image, i) => {
               return (<ArkworkImage
               key={i}
@@ -196,8 +179,6 @@ const downloadImage = (blob, fileName) => {
         </Stage>
       </div>
       <div className="w-1/4 px-3">
-      <CirclePicker colors={["red", "blue"]} onChangeComplete={handleChangeColor}></CirclePicker>
-
         <div className="text-left w-full h-4/5 px-3">
           <h2 className="text-lg text-center font-bold p-2">Thuộc tính áo</h2>
           <hr />
@@ -232,13 +213,4 @@ const downloadImage = (blob, fileName) => {
 export default Home;
 
 const LIST_SIZE = ["XS", "S", "M", "L", "XXl", "XXXl"];
-const LIST_METERIALS = [
-  {
-    "name": "100% cotton",
-    "color": ["orange", "red", "green", "black", "white"],
-  },
-  {
-    "name": "95% cotton, 5% spandex",
-    "color": ["orange", "red", "black", "white"],
-  }
-] 
+
