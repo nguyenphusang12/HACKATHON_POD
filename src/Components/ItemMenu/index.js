@@ -1,5 +1,6 @@
 import React from "react";
 import iconAdd from "assets/image/Shape_6.png";
+import minusIcon from "assets/image/minus.svg";
 
 const ItemMenu = ({ title, icon, handleClickMenu, item }) => {
   const handleClick = () => {
@@ -16,7 +17,11 @@ const ItemMenu = ({ title, icon, handleClickMenu, item }) => {
           <span className="text-base break-all">{title}</span>
         </div>
         <div>
-          <img src={iconAdd} alt="" />
+          {item.isShow ? (
+            <img src={minusIcon} alt="" />
+          ) : (
+            <img src={iconAdd} alt="" />
+          )}
         </div>
       </div>
       <div className="w-full h-[1px] bg-[#bebaba]" />

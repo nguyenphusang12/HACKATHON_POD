@@ -93,7 +93,7 @@ const LIST_BUTTONS_CONTROL = [
   },
   {
     id: 2,
-    title: "Màu áo",
+    title: "Chất liệu và màu sắc",
     isShow: false,
     icon: colorIcon,
   },
@@ -158,15 +158,15 @@ const Home = () => {
                 handleClickMenu={handleClickMenu}
                 item={item}
               />
-              {item.isShow && <DetailMenu />}
+              {item.isShow && <DetailMenu item={item}/>}
             </>
           ))}
         </div>
       </div>
       <div className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500">
          <div style={{ width: '100%', height: 610, position: "relative"}}>
-            <div class="" style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: "red"}}></div>
-            <img class="object-cover" style={{position: 'absolute', top: 0, left: 0, width: width, height: 'auto' }} src="assets/ao3.png"/>
+            <div className="" style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: "red"}}></div>
+            <img className="object-cover" alt="" style={{position: 'absolute', top: 0, left: 0, width: width, height: 'auto' }} src="assets/ao3.png"/>
         </div>
         {/* <Stage
           width={window.innerWidth}
