@@ -4,7 +4,7 @@ import logoYody from "assets/image/Yody.svg";
 
 const Layout = () => {
   return (
-    <div className="max-w-7xl w-full mx-auto">
+    <div className="max-w-7xl w-full px-4 mx-auto">
       <div className="w-full relative h-20 flex items-center justify-center">
         <div className="absolute left-0">
           <img src={logoYody} alt="Yo" />
