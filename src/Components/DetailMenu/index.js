@@ -29,7 +29,7 @@ const DetailMenu = ({ item, setColor }) => {
           <div className="p-3">
             <div className="grid grid-cols-2 gap-3">
               {LIST_MATERIALS.map((item) => (
-                <div onClick={() => setSelect(item)} className="">
+                <div onClick={() => setSelect(item)} className="cursor-pointer">
                   <div className="relative">
                     <img src={fram981} alt="gbc" className="mb-2" />
                     <div className="text-white absolute bottom-0 right-0 text-xs p-1 rounded bg-[rgba(0,0,0,.7)]">
@@ -69,13 +69,27 @@ const DetailMenu = ({ item, setColor }) => {
           </div>
         );
         return;
-      
+      case 4:
+        setBody(
+          <div className="grid grid-cols-2 gap-1">
+            {[...Array(20).keys()].map((item) => (
+              <div className="cursor-pointer">
+                <img src={`assets/artwork/10${67 + item}.png`} alt="item" />
+              </div>
+            ))}
+          </div>
+        );
+        return;
       default:
         return;
     }
   }, [select]);
 
-  return <div className="h-auto max-h-64 overflow-auto">{body ? body : "No data"}</div>;
+  return (
+    <div className="h-auto max-h-64 overflow-auto">
+      {body ? body : "No data"}
+    </div>
+  );
 };
 
 export default DetailMenu;

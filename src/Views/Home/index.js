@@ -70,7 +70,7 @@ const LIST_BUTTONS_CONTROL = [
 const Home = () => {
   const [rectangles, setRectangles] = React.useState(initialRectangles);
   const [selectedId, selectShape] = React.useState(null);
-  const [width, setWidth] = useState(700);
+  const [width, setWidth] = useState(700);  
   const [height, setHeight] = useState(685);
   const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
@@ -146,10 +146,10 @@ const downloadImage = (blob, fileName) => {
           ))}
         </div>
       </div>
-      <div id="design-container" className="w-1/2 overflow-hidden shadow-sm shadow-neutral-500 relative">
+      <div id="design-container" className="w-1/2 overflow-hidden  relative">
 
          <div style={{ width: '100%'}}>
-            <img className="object-cover" alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
+            <img alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
         </div>
         <Stage
           width={window.innerWidth}
@@ -203,6 +203,7 @@ const downloadImage = (blob, fileName) => {
                 </div>
               ))}
             </div>
+            <div className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500">Tính giá</div>
           </div>
         </div>
       </div>
