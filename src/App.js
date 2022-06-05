@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import "./App.css";
 const Home = React.lazy(() => import("Views/Home"));
 const About = React.lazy(() => import("Views/About"));
+const Payment = React.lazy(() => import("Views/Payment"));
 const Layout = React.lazy(() => import("Components/Layout"));
 
 function App() {
@@ -23,6 +24,14 @@ function App() {
             element={
               <React.Suspense fallback={<>...</>}>
                 <About />
+              </React.Suspense>
+            }
+          />
+          <Route
+            path="payment"
+            element={
+              <React.Suspense fallback={<>...</>}>
+                <Payment />
               </React.Suspense>
             }
           />
