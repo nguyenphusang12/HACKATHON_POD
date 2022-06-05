@@ -14,6 +14,7 @@ import Text from "Components/KonvaObject/Text";
 import { FONTS } from "data/font";
 import { useDispatch } from "react-redux";
 import { setTitlePage } from "Store";
+import { getPrice } from "Api";
 
 const LIST_BUTTONS_CONTROL = [
   {
@@ -68,6 +69,13 @@ const Home = () => {
   const [underline, setUndeline] = useState(false);
   const [position, setPositon] = useState("left");
   const [currentProduct, setCurrentProduct] = useState("assets/ao3.png");
+  const [selectProduct, setSelectProduct] = useState({
+    image: "",
+    type: "",
+    quanlity: "",
+    quantity: null,
+    price: null,
+  });
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -159,7 +167,7 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    dispatch(setTitlePage("Thiết kế mẫu áo của bạn"))
+    dispatch(setTitlePage("Thiết kế mẫu áo của bạn"));
   }, []);
   return (
     <div className="flex w-full">
