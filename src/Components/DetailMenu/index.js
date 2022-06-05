@@ -6,10 +6,21 @@ import shirt_4 from "assets/image/shirt_4.svg";
 import shirt_5 from "assets/image/shirt_5.svg";
 import shirt_6 from "assets/image/shirt_6.svg";
 import fram981 from "assets/image/frame981.png";
+import TextDraw from "Components/Common/TextDraw";
+import { FONT_STYLE } from "data/font";
 
-const DetailMenu = ({ item, setColor }) => {
+const DetailMenu = ({ item, setColor, setDragCurrent }) => {
   const [body, setBody] = useState();
   const [select, setSelect] = useState();
+  const [listImage, setListImage] = useState([]);
+  useEffect(() => {
+    let images = []
+    for (var i=1067; i<1080; i++) {
+      images.push({id: i, src:  `../../assets/artwork/${i}.png`})
+    }
+    setListImage(images);
+  }, [])
+
   useEffect(() => {
     switch (item.id) {
       case 1:
@@ -69,21 +80,49 @@ const DetailMenu = ({ item, setColor }) => {
           </div>
         );
         return;
+      case 3:
+        setBody(
+          <div className="grid grid-cols-2 gap-1">
+            {FONT_STYLE.map(font => (
+              <TextDraw 
+              {...font} 
+              draggable={true} 
+              onDragStart={(e) => {
+                if (font.otherText) {
+                  setDragCurrent({...font, type: "text", width: e.target.children[0].clientWidth, height: e.target.children[0].clientHeight, otherText:{...font.otherText, width: e.target.children[1].clientWidth, height: e.target.children[1].clientHeight} });
+                } else {
+                  setDragCurrent({...font, type: "text", width: e.target.clientWidth, height: e.target.clientHeight});
+                }
+                
+              }}></TextDraw>
+            ))}
+          </div>
+        );
+        return;
       case 4:
         setBody(
           <div className="grid grid-cols-2 gap-1">
-            {[...Array(20).keys()].map((item) => (
+            {listImage && listImage.map((item) => {
+              return (
               <div className="cursor-pointer">
-                <img src={`assets/artwork/10${67 + item}.png`} alt="item" />
+                <img 
+                key={item.id}
+                src={item.src} 
+                alt="item" 
+                draggable="true"
+                onDragStart={(e) => {
+                  setDragCurrent({...item, type: "artwork"});
+                  // dragUrl.current = e.target.src;
+                }}/>
               </div>
-            ))}
+            )})}
           </div>
         );
         return;
       default:
         return;
     }
-  }, [select]);
+  }, [select, listImage]);
 
   return (
     <div className="h-auto max-h-64 overflow-auto">

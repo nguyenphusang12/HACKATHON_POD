@@ -11,6 +11,9 @@ import downloadIcon from "assets/image/Shape_5.png";
 import DetailMenu from "Components/DetailMenu";
 import { CirclePicker } from 'react-color';
 import html2canvas from "html2canvas";
+import Text from "Components/KonvaObject/Text";
+
+
 const initialRectangles = [
   {
     x: 150,
@@ -74,13 +77,15 @@ const Home = () => {
   const [height, setHeight] = useState(685);
   const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
-  const [listImage, setListImage] = useState([]);
   const [listImageDesign, setListImageDesign] = useState([]);
-
+  const stageRef = React.useRef();
+  const containerRef = React.useRef();;
+  const [dragCurrent, setDragCurrent] = useState(null);
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
       selectShape(null);
+      containerRef.current = null;
     }
   };
   const handleClickMenu = (id) => {
@@ -92,16 +97,6 @@ const Home = () => {
       return item.id === id;
     });
   };
-
-  useEffect(() => {
-    let images = []
-    for (var i=1067; i<1069; i++) {
-      const imageObj = new Image();
-      imageObj.src = `../../assets/artwork/${i}.png`
-      images.push({id: i, image: imageObj, width: 150, height: 150, x: 200, y: 300})
-    }
-    setListImage(images);
-  }, [])
  
   const handleChangeColor = (color) => {
     setColor(color.hex);
@@ -113,7 +108,6 @@ const Home = () => {
       downloadImage(image, "design")
   });
 };
-
 const downloadImage = (blob, fileName) => {
     const fakeLink = window.document.createElement("a");
     fakeLink.style = "display:none;";
@@ -127,6 +121,65 @@ const downloadImage = (blob, fileName) => {
     
     fakeLink.remove();
   };
+
+  const handleDeleteArtwork = () => {
+    const images = listImageDesign.filter(x => x.id != selectedId);
+    setListImageDesign(images)
+  }
+
+  const handleChangeFont = () => {
+    
+  }
+  
+  const handleDragArtwork = () => {
+    console.log(dragCurrent)
+    switch (dragCurrent.type) {
+      case "text":
+       let texts = listImageDesign.concat([
+          {
+            id: new Date().getTime(),
+            ...stageRef.current.getPointerPosition(),
+            ...dragCurrent,
+            type: "text"
+          },
+        ])
+        if (dragCurrent.otherText) {
+          texts = texts.concat(
+            [
+              {
+                id: new Date().getTime() + 1,
+                x: stageRef.current.getPointerPosition().x,
+                y: stageRef.current.getPointerPosition().y + dragCurrent.fontSize + 5,
+                ...dragCurrent.otherText,
+                type: "text"
+              },
+            ]
+          )
+        }
+        setListImageDesign(
+          texts
+        );
+        return;
+      case "artwork":
+        setListImageDesign(
+          listImageDesign.concat([
+            {
+              id: new Date().getTime(),
+              ...stageRef.current.getPointerPosition(),
+              width: 150,
+              height: 150,
+              src: dragCurrent.src,
+              type: "artwork"
+            },
+          ])
+        );
+        return;
+      default:
+        return;
+    }
+
+    
+  }
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
@@ -139,9 +192,8 @@ const downloadImage = (blob, fileName) => {
                 icon={item.icon}
                 handleClickMenu={index === 5 ? handleDownload : handleClickMenu}
                 item={item}
-                listImage={listImage}
-              />
-              {item.isShow && <DetailMenu item={item} setColor={setColor}/>}
+                />
+              {item.isShow && <DetailMenu item={item} setColor={setColor} setDragCurrent={setDragCurrent}/>}
             </>
           ))}
         </div>
@@ -151,32 +203,85 @@ const downloadImage = (blob, fileName) => {
          <div style={{ width: '100%'}}>
             <img alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
         </div>
+        <div
+          id="page-container" 
+          style={{ position: "absolute", top: 0, left: 0, width:'100%'}}
+           onDrop={(e) => {
+            e.preventDefault();
+            // register event position
+            stageRef.current.setPointersPositions(e);
+            // add image
+
+            handleDragArtwork()
+          }}
+          onDragOver={(e) => e.preventDefault()}
+        >
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
-          style={{ position: "absolute", top: 0, left: 0 }}
           onMouseDown={checkDeselect}
           onTouchStart={checkDeselect}
+          ref={stageRef}
         >
+
+
+
           <Layer>
-            {listImage.map((image, i) => {
-              return (<ArkworkImage
-              key={i}
-              shapeProps={image}
-              isSelected={image.id === selectedId}
-              onSelect={() => {
-                selectShape(image.id);
-              }}
-            onChange={(newAttrs) => {
-              const images = listImage.slice();
-              images[i] = newAttrs;
-              setListImage(images);
-            }}
-            />)
+            {listImageDesign.map((item, i) => {
+               switch (item.type) {
+                case "text":
+                  return (
+                    <Text
+                    key={i}
+                    pageRef={containerRef}
+                    shapeProps={{ ...item, fill: item.color }}
+                    isSelected={item.id === selectedId}
+                    onSelect={() => {
+                      selectShape(item.id);
+                    }}
+                    onChange={(newAttrs) => {
+                    const images = listImageDesign.slice();
+                    images[i] = newAttrs;
+                    setListImageDesign(images);
+                  }}
+                  />)
+                case "artwork":
+                  return (
+                    <ArkworkImage
+                    key={i}
+                    shapeProps={item}
+                    isSelected={item.id === selectedId}
+                    onSelect={() => {
+                      selectShape(item.id);
+                    }}
+                  onChange={(newAttrs) => {
+                    const images = listImageDesign.slice();
+                    images[i] = newAttrs;
+                    setListImageDesign(images);
+                  }}
+                  />)
+                default:
+                  return <></>;
+              }
+              
             })}
+            
             
           </Layer>
         </Stage>
+        </div>
+        <div className="absolute top-2 right-2 cursor-pointer" onClick={handleDeleteArtwork}>
+            Delete
+        </div>
+        {
+          selectedId !== null && 
+          <div className="absolute top-2 left-4 cursor-pointer flex" onClick={handleChangeFont}>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">B</div>
+            <div className="px-2 italic border-2 border-slate-50 bg-white text-black">I</div>
+            <div className="px-2 underline border-2 border-slate-50 bg-white text-black">U</div>
+        </div>
+        }
+        
       </div>
       <div className="w-1/4 px-3">
         <div className="text-left w-full h-4/5 px-3">

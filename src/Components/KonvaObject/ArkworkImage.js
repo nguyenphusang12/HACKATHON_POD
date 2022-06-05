@@ -1,10 +1,11 @@
 import React from "react";
 import { Transformer, Image as KonvaImage } from "react-konva";
+import useImage from "use-image";
 
 const ArkworkImage = ({ shapeProps, isSelected, onSelect, onChange }) => {
     const shapeRef = React.useRef();
     const trRef = React.useRef();
-    
+    const [img] = useImage(shapeProps.src)
     React.useEffect(() => {
       if (isSelected) {
         trRef.current.nodes([shapeRef.current]);
@@ -18,6 +19,7 @@ const ArkworkImage = ({ shapeProps, isSelected, onSelect, onChange }) => {
           onClick={onSelect}
           onTap={onSelect}
           ref={shapeRef}
+          image={img}
           {...shapeProps}
           draggable
           onDragEnd={(e) => {
@@ -27,11 +29,11 @@ const ArkworkImage = ({ shapeProps, isSelected, onSelect, onChange }) => {
               y: e.target.y(),
             });
           }}
+        
           onTransformEnd={(e) => {
             const node = shapeRef.current;
             const scaleX = node.scaleX();
             const scaleY = node.scaleY();
-            console.log(scaleX);
             node.scaleX(1);
             node.scaleY(1);
             onChange({
