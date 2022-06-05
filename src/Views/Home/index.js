@@ -73,6 +73,7 @@ const Home = () => {
   const [select, setSelect] = useState();
   const [typePr, setTypePro] = useState();
   const [qualitySize, setQualitySize] = useState({});
+  const [amount, setAmount] = useState({});
   const props = useRef({
     image: "",
     type: "",
@@ -88,9 +89,32 @@ const Home = () => {
       type: select?.desc,
       ...qualitySize,
       name: typePr,
-      value: Object.values(qualitySize).reduce((pre, cur) => pre + Number(cur), 0),
+      value: Object.values(qualitySize).reduce(
+        (pre, cur) => pre + Number(cur),
+        0
+      ),
     };
   }, [currentProduct, select, qualitySize, typePr]);
+  useEffect(() => {
+    const run = async () => {
+      const params = {
+        productId: 1,
+        sizeQuantity: {
+          ...qualitySize,
+        },
+        color: color,
+        printCondition: {
+          front: 1,
+        },
+      };
+
+      try {
+        const res = await getPrice(params);
+        setAmount({ ...res.data });
+      } catch (error) {}
+    };
+    run();
+  }, [qualitySize, color]);
   const addProductToCart = () => {
     toast("Thêm giỏ hàng thành công!");
     dispatch(addProduct(props.current));
@@ -113,12 +137,12 @@ const Home = () => {
   };
 
   const handleDownload = () => {
-    html2canvas(document.querySelector("#download-image")).then(canvas => {
-      const image = canvas.toDataURL("image/png", 1.0)
-      downloadImage(image, "design")
-  });
-};
-const downloadImage = (blob, fileName) => {
+    html2canvas(document.querySelector("#download-image")).then((canvas) => {
+      const image = canvas.toDataURL("image/png", 1.0);
+      downloadImage(image, "design");
+    });
+  };
+  const downloadImage = (blob, fileName) => {
     const fakeLink = window.document.createElement("a");
     fakeLink.style = "display:none;";
     fakeLink.download = fileName;
@@ -133,19 +157,17 @@ const downloadImage = (blob, fileName) => {
   };
 
   const handleDeleteArtwork = () => {
-    const images = listImageDesign.filter(x => x.id !== selectedId);
-    setListImageDesign(images)
-    selectShape(null)
-  }
+    const images = listImageDesign.filter((x) => x.id !== selectedId);
+    setListImageDesign(images);
+    selectShape(null);
+  };
 
-  const handleChangeFont = () => {
-    
-  }
+  const handleChangeFont = () => {};
   const handleOnKeyDown = (e) => {
     if (e.keyCode === 8 || e.keyCode === 46) {
-      handleDeleteArtwork()
-    } 
-  }
+      handleDeleteArtwork();
+    }
+  };
   const handleDragArtwork = () => {
     switch (dragCurrent.type) {
       case "text":
@@ -223,82 +245,105 @@ const downloadImage = (blob, fileName) => {
       </div>
       <div id="design-container" className="w-1/2 overflow-hidden relative">
         <div id="download-image">
-        <div style={{ width: '100%'}}>
-            <img alt="" style={{top: 0, left: 0, width: 700, background: color }} src={`${currentProduct}`}/>
-        </div>
-        <div
-          id="page-container"
-          style={{ position: "absolute", top: 0, left: 0, width: "100%" }}
-          onDrop={(e) => {
-            e.preventDefault();
-            // register event position
-            stageRef.current.setPointersPositions(e);
-            // add image
+          <div style={{ width: "100%" }}>
+            <img
+              alt=""
+              style={{ top: 0, left: 0, width: 700, background: color }}
+              src={`${currentProduct}`}
+            />
+          </div>
+          <div
+            id="page-container"
+            style={{ position: "absolute", top: 0, left: 0, width: "100%" }}
+            onDrop={(e) => {
+              e.preventDefault();
+              // register event position
+              stageRef.current.setPointersPositions(e);
+              // add image
 
-            handleDragArtwork();
-          }}
-          
-          onDragOver={(e) => e.preventDefault()}
-          onKeyDown={handleOnKeyDown}
-          tabIndex={-1}
-        >
-        <Stage
-          width={window.innerWidth}
-          height={window.innerHeight}
-          onMouseDown={checkDeselect}
-          onTouchStart={checkDeselect}
-          ref={stageRef}
-        >
-          <Layer>
-            {listImageDesign.map((item, i) => {
-               switch (item.type) {
-                case "text":
-                  return (
-                    <Text
-                    key={i}
-                    pageRef={containerRef}
-                    shapeProps={{ ...item, fill: item.color, fontStyle: item.fontWeight ? item.fontWeight : "normal"}}
-                    isSelected={item.id === selectedId}
-                    onSelect={() => {
-                      setFontSelected(containerRef.current.fontFamily());
-                      setBold(containerRef.current.fontStyle().includes("bold"))
-                      setItalic(containerRef.current.fontStyle().includes("italic"))
-                      setUndeline(containerRef.current.fontStyle().includes("underline"))
-                      selectShape(item.id);
-                    }}
-                    onChange={(newAttrs) => {
-                    const images = listImageDesign.slice();
-                    images[i] = newAttrs;
-                    setListImageDesign(images);
-                  }}
-                  />)
-                case "artwork":
-                  return (
-                    <ArkworkImage
-                    key={i}
-                    shapeProps={item}
-                    isSelected={item.id === selectedId}
-                    onSelect={() => {
-                      selectShape(item.id);
-                    }}
-                  onChange={(newAttrs) => {
-                    const images = listImageDesign.slice();
-                    images[i] = newAttrs;
-                    setListImageDesign(images);
-                  }}
-                  />)
-                default:
-                  return <div key={i}></div>;
-              }
-              
-            })}
-          </Layer>
-        </Stage>
+              handleDragArtwork();
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onKeyDown={handleOnKeyDown}
+            tabIndex={-1}
+          >
+            <Stage
+              width={window.innerWidth}
+              height={window.innerHeight}
+              onMouseDown={checkDeselect}
+              onTouchStart={checkDeselect}
+              ref={stageRef}
+            >
+              <Layer>
+                {listImageDesign.map((item, i) => {
+                  switch (item.type) {
+                    case "text":
+                      return (
+                        <Text
+                          key={i}
+                          pageRef={containerRef}
+                          shapeProps={{
+                            ...item,
+                            fill: item.color,
+                            fontStyle: item.fontWeight
+                              ? item.fontWeight
+                              : "normal",
+                          }}
+                          isSelected={item.id === selectedId}
+                          onSelect={() => {
+                            setFontSelected(containerRef.current.fontFamily());
+                            setBold(
+                              containerRef.current.fontStyle().includes("bold")
+                            );
+                            setItalic(
+                              containerRef.current
+                                .fontStyle()
+                                .includes("italic")
+                            );
+                            setUndeline(
+                              containerRef.current
+                                .fontStyle()
+                                .includes("underline")
+                            );
+                            selectShape(item.id);
+                          }}
+                          onChange={(newAttrs) => {
+                            const images = listImageDesign.slice();
+                            images[i] = newAttrs;
+                            setListImageDesign(images);
+                          }}
+                        />
+                      );
+                    case "artwork":
+                      return (
+                        <ArkworkImage
+                          key={i}
+                          shapeProps={item}
+                          isSelected={item.id === selectedId}
+                          onSelect={() => {
+                            selectShape(item.id);
+                          }}
+                          onChange={(newAttrs) => {
+                            const images = listImageDesign.slice();
+                            images[i] = newAttrs;
+                            setListImageDesign(images);
+                          }}
+                        />
+                      );
+                    default:
+                      return <div key={i}></div>;
+                  }
+                })}
+              </Layer>
+            </Stage>
+          </div>
         </div>
-        </div>
-         
-        <div className="absolute top-2 right-2 cursor-pointer" onClick={handleDeleteArtwork}>
-        <i className="fa-solid fa-trash-can text-3xl"></i>
+
+        <div
+          className="absolute top-2 right-2 cursor-pointer"
+          onClick={handleDeleteArtwork}
+        >
+          <i className="fa-solid fa-trash-can text-3xl"></i>
         </div>
         {selectedId !== null && (
           <div
@@ -306,21 +351,98 @@ const downloadImage = (blob, fileName) => {
             onClick={handleChangeFont}
           >
             <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">
-            <select defaultValue={fontSelected} onChange={(e) => {setFontSelected(e.target.value);  containerRef.current.fontFamily(e.target.value)}}>
-              {FONTS.map((x, index) => { return (<option key={index} value={x} >{x}</option>)
-              })}
-            </select>
+              <select
+                defaultValue={fontSelected}
+                onChange={(e) => {
+                  setFontSelected(e.target.value);
+                  containerRef.current.fontFamily(e.target.value);
+                }}
+              >
+                {FONTS.map((x, index) => {
+                  return (
+                    <option key={index} value={x}>
+                      {x}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: bold?"#CCC":"#FFF" }} onClick={() => {setBold(!bold); bold ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("bold")}}>B</div>
-            <div className="px-2 italic border-2 border-slate-50 bg-white text-black" style={{background: italic?"#CCC":"#FFF" }} onClick={() => {setItalic(!italic); italic ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("italic")}}>I</div>
-            <div className="px-2 underline border-2 border-slate-50 bg-white text-black" style={{background: underline?"#CCC":"#FFF" }} onClick={() => {setUndeline(!underline); containerRef.current.fontStyle("underline")}}>U</div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="left"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="left" ? "" : "left"); containerRef.current.align("left");}}><i className="fa-solid fa-align-left"></i></div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="center"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="center" ? "" : "center"); containerRef.current.align("center");}}><i className="fa-solid fa-align-center"></i></div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="right"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="right" ? "" : "right"); containerRef.current.align("right");}}><i className="fa-solid fa-align-right"></i></div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="justify"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="justify" ? "" : "justify"); containerRef.current.align("justify");}}><i className="fa-solid fa-align-justify"></i></div>
-        </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: bold ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setBold(!bold);
+                bold
+                  ? containerRef.current.fontStyle("normal")
+                  : containerRef.current.fontStyle("bold");
+              }}
+            >
+              B
+            </div>
+            <div
+              className="px-2 italic border-2 border-slate-50 bg-white text-black"
+              style={{ background: italic ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setItalic(!italic);
+                italic
+                  ? containerRef.current.fontStyle("normal")
+                  : containerRef.current.fontStyle("italic");
+              }}
+            >
+              I
+            </div>
+            <div
+              className="px-2 underline border-2 border-slate-50 bg-white text-black"
+              style={{ background: underline ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setUndeline(!underline);
+                containerRef.current.fontStyle("underline");
+              }}
+            >
+              U
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "left" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "left" ? "" : "left");
+                containerRef.current.align("left");
+              }}
+            >
+              <i className="fa-solid fa-align-left"></i>
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "center" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "center" ? "" : "center");
+                containerRef.current.align("center");
+              }}
+            >
+              <i className="fa-solid fa-align-center"></i>
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "right" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "right" ? "" : "right");
+                containerRef.current.align("right");
+              }}
+            >
+              <i className="fa-solid fa-align-right"></i>
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "justify" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "justify" ? "" : "justify");
+                containerRef.current.align("justify");
+              }}
+            >
+              <i className="fa-solid fa-align-justify"></i>
+            </div>
+          </div>
         )}
-        
       </div>
       <div className="w-1/4 px-3">
         <div className="text-left w-full h-4/5 px-3">
@@ -353,19 +475,19 @@ const downloadImage = (blob, fileName) => {
             </div>
             <div className="flex justify-between my-1 ">
               <div className="">Tiền áo:</div>
-              <div className="">135.000 đ</div>
+              <div className="">{amount.basePrice}</div>
             </div>
             <div className="flex justify-between my-1">
               <div className="">Tiền in:</div>
-              <div className="">100.000 đ</div>
+              <div className="">{amount.printPrice}</div>
             </div>
             <div className="flex justify-between my-1">
-              <div className="">Tiền ảnh:</div>
-              <div className="">135.000 đ</div>
+              <div className="">Giảm giá:</div>
+              <div className="">{amount.oldPrice - amount.salePrice}</div>
             </div>
             <div className="flex justify-between my-1">
               <div className="">Tổng cộng:</div>
-              <div className="">135.000 đ</div>
+              <div className="">{amount.salePrice}</div>
             </div>
             <div
               onClick={addProductToCart}

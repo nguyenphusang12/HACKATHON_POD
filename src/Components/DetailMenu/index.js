@@ -241,11 +241,11 @@ const LIST_MATERIALS = [
   {
     id: 1,
     desc: "95% cotton, 5% spandex95% cotton, 5% spandex",
-    color: ["#E69E1E", "#428F5E", "#0A4ACC"],
+    color: ["#FFA600", "#9C071E", "#7BA37D"],
   },
   {
     id: 2,
     desc: "65% cotton, 15% spandex95% cotton, 20% spandex",
-    color: ["red", "green", "blue"],
+    color: ["#A6D7FF", "#9c071e", "#f44c73"],
   },
 ];

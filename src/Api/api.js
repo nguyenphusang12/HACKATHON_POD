@@ -6,7 +6,7 @@ const headers = {
 };
 
 const axiosInstance = axios.create({
-  baseURL: process.env.MIX_API_URL,
+  baseURL: "http://192.168.8.218:8080/api/",
   headers,
 });
 axiosInstance.interceptors.request.use(
@@ -34,10 +34,10 @@ axiosInstance.interceptors.response.use(
 );
 const getFunc = (url, config = {}) => axiosInstance.get(url, config);
 const postFunc = (url, data, config = {}) =>
-  axiosInstance.get(url, data, config);
-const putFunc = (url, data, config = {}) =>
   axiosInstance.post(url, data, config);
-const deleteFunc = (url, config = {}) => axiosInstance.get(url, config);
+const putFunc = (url, data, config = {}) =>
+  axiosInstance.put(url, data, config);
+const deleteFunc = (url, config = {}) => axiosInstance.delete(url, config);
 
 export default {
   get: getFunc,
