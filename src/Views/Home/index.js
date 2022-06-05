@@ -279,7 +279,7 @@ const Home = () => {
           className="absolute top-2 right-2 cursor-pointer"
           onClick={handleDeleteArtwork}
         >
-          Delete
+          <i className="fa-solid fa-trash-can text-3xl"></i>
         </div>
         {selectedId !== null && (
           <div
@@ -424,7 +424,7 @@ const Home = () => {
               <div className="">135.000 đ</div>
             </div>
             <div className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500">
-              Tính giá
+              Thêm vào giỏ hàng
             </div>
           </div>
         </div>

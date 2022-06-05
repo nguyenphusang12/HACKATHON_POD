@@ -197,8 +197,8 @@ const Payment = () => {
                   <div>Size áo - Số lượng: XS-02;XL-10</div>
                 </div>
               </div>
-              <div className="">12(cái)</div>
-              <div className="">
+              <div className="flex-1 text-right">12(cái)</div>
+              <div className="flex-1 text-right">
                 <i className="fa-solid fa-trash-can"></i>
               </div>
               <div className="flex-1 text-right">685,500đ</div>
