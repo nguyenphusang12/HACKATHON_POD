@@ -1,21 +1,34 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import logoYody from "assets/image/Yody.svg";
+import logoYody from "assets/image/Yody.png";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Layout = () => {
+  const titlePage = useSelector((state) => state.product.titlePage);
   const [showModal, setShowModal] = useState(false);
-
+  let navigate = useNavigate();
+  const goHome = () => {
+    navigate(`/`);
+  };
+  const goPayment = () => {
+    navigate("/payment");
+    setShowModal(false)
+  };
   return (
     <div className="max-w-7xl w-full px-4 mx-auto">
       {showModal && (
-        <div onClick={() => setShowModal(false)} className="fixed top-0 right-0 left-0 bottom-0 bg-[rgba(0,0,0,.3)] z-[1]"></div>
+        <div
+          onClick={() => setShowModal(false)}
+          className="fixed top-0 right-0 left-0 bottom-0 bg-[rgba(0,0,0,.3)] z-[1]"
+        ></div>
       )}
       <div className="w-full relative h-20 flex items-center justify-center">
-        <div className="absolute left-0">
-          <img src={logoYody} alt="Yo" />
+        <div className="absolute left-0 cursor-pointer" onClick={goHome}>
+          <img src={logoYody} alt="Yo" className="w-24"/>
         </div>
         <div className="text-2xl text-2xl font-bold">
-          Thiết kế mẫu áo của bạn
+          {titlePage}
         </div>
         <div className="absolute right-0 ">
           {showModal && (
@@ -55,7 +68,10 @@ const Layout = () => {
                 >
                   Đóng
                 </button>
-                <button className="px-4 py-2 bg-[#0C5DFF] text-white rounded active:opacity-80">
+                <button
+                  className="px-4 py-2 bg-[#0C5DFF] text-white rounded active:opacity-80"
+                  onClick={goPayment}
+                >
                   Thanh toán
                 </button>
               </div>

@@ -10,3 +10,8 @@ export const uploadImage = async (file) => {
     },
   });
 };
+
+export const getPrice = async(data)=>{
+  const res = await api.post(apiContants.GET_PRICE,data)
+  return res
+}

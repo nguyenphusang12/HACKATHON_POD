@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Stage, Layer } from "react-konva";
 import ItemMenu from "Components/ItemMenu";
 import ArkworkImage from "Components/KonvaObject/ArkworkImage";
@@ -12,6 +12,10 @@ import DetailMenu from "Components/DetailMenu";
 import html2canvas from "html2canvas";
 import Text from "Components/KonvaObject/Text";
 import { FONTS } from "data/font";
+import { useDispatch } from "react-redux";
+import { setTitlePage } from "Store";
+import { getPrice } from "Api";
+
 const LIST_BUTTONS_CONTROL = [
   {
     id: 1,
@@ -51,19 +55,27 @@ const LIST_BUTTONS_CONTROL = [
   },
 ];
 const Home = () => {
+  const dispatch = useDispatch();
   const [selectedId, selectShape] = React.useState(null);
   const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
   const [listImageDesign, setListImageDesign] = useState([]);
   const stageRef = React.useRef();
-  const containerRef = React.useRef();;
+  const containerRef = React.useRef();
   const [dragCurrent, setDragCurrent] = useState(null);
   const [fontSelected, setFontSelected] = useState("Roboto");
   const [bold, setBold] = useState(false);
   const [italic, setItalic] = useState(false);
   const [underline, setUndeline] = useState(false);
   const [position, setPositon] = useState("left");
-  const [currentProduct,setCurrentProduct] = useState("assets/ao3.png");
+  const [currentProduct, setCurrentProduct] = useState("assets/ao3.png");
+  const [selectProduct, setSelectProduct] = useState({
+    image: "",
+    type: "",
+    quanlity: "",
+    quantity: null,
+    price: null,
+  });
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -80,7 +92,6 @@ const Home = () => {
       return item.id === id;
     });
   };
- 
 
   const handleDownload = () => {
     html2canvas(document.querySelector("#download-image")).then(canvas => {
@@ -92,13 +103,13 @@ const downloadImage = (blob, fileName) => {
     const fakeLink = window.document.createElement("a");
     fakeLink.style = "display:none;";
     fakeLink.download = fileName;
-    
+
     fakeLink.href = blob;
-    
+
     document.body.appendChild(fakeLink);
     fakeLink.click();
     document.body.removeChild(fakeLink);
-    
+
     fakeLink.remove();
   };
 
@@ -119,30 +130,29 @@ const downloadImage = (blob, fileName) => {
   const handleDragArtwork = () => {
     switch (dragCurrent.type) {
       case "text":
-       let texts = listImageDesign.concat([
+        let texts = listImageDesign.concat([
           {
             id: new Date().getTime(),
             ...stageRef.current.getPointerPosition(),
             ...dragCurrent,
-            type: "text"
+            type: "text",
           },
-        ])
+        ]);
         if (dragCurrent.otherText) {
-          texts = texts.concat(
-            [
-              {
-                id: new Date().getTime() + 1,
-                x: stageRef.current.getPointerPosition().x,
-                y: stageRef.current.getPointerPosition().y + dragCurrent.fontSize + 5,
-                ...dragCurrent.otherText,
-                type: "text"
-              },
-            ]
-          )
+          texts = texts.concat([
+            {
+              id: new Date().getTime() + 1,
+              x: stageRef.current.getPointerPosition().x,
+              y:
+                stageRef.current.getPointerPosition().y +
+                dragCurrent.fontSize +
+                5,
+              ...dragCurrent.otherText,
+              type: "text",
+            },
+          ]);
         }
-        setListImageDesign(
-          texts
-        );
+        setListImageDesign(texts);
         return;
       case "artwork":
         setListImageDesign(
@@ -153,7 +163,7 @@ const downloadImage = (blob, fileName) => {
               width: dragCurrent.useDefault ? 150 : dragCurrent.width,
               height: dragCurrent.useDefault ? 150 : dragCurrent.height,
               src: dragCurrent.src,
-              type: "artwork"
+              type: "artwork",
             },
           ])
         );
@@ -161,62 +171,10 @@ const downloadImage = (blob, fileName) => {
       default:
         return;
     }
-     
-  }
-
-  const handleClickItem = (item) => {
-    var _item = JSON.parse(JSON.stringify(item)) 
-    switch (_item.type) {
-      case "text":
-       let texts = listImageDesign.concat([
-          {
-            id: new Date().getTime(),
-            x: 250, 
-            y: 200,
-            ..._item,
-            type: "text"
-          },
-        ])
-        if (_item.otherText) {
-          texts = texts.concat(
-            [
-              {
-                id: new Date().getTime() + 1,
-                x: 250, 
-                y: 200 + item.fontSize + 5,
-                ..._item.otherText,
-                type: "text"
-              },
-            ]
-          )
-        }
-        setListImageDesign(
-          texts
-        );
-        return;
-      case "artwork":
-        let list = listImageDesign.concat([
-          {
-            id: new Date().getTime(),
-            x: 250, 
-            y: 200,
-            width: _item.useDefault ? 150 : _item.width,
-            height: _item.useDefault ? 150 : _item.height,
-            src: _item.src,
-            type: "artwork"
-          }
-        ])
-        
-        setListImageDesign(
-            
-        );
-        console.log(list)
-        return;
-      default:
-        return;
-    }
-  }
-
+  };
+  useEffect(() => {
+    dispatch(setTitlePage("Thiết kế mẫu áo của bạn"));
+  }, []);
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
@@ -228,8 +186,9 @@ const downloadImage = (blob, fileName) => {
                 icon={item.icon}
                 handleClickMenu={index === 5 ? handleDownload : handleClickMenu}
                 item={item}
-                />
-              {item.isShow && <DetailMenu setCurrentProduct={setCurrentProduct} item={item} setColor={setColor} setDragCurrent={setDragCurrent} handleClickItem={handleClickItem}/>}
+              />
+              
+              {item.isShow && <DetailMenu setCurrentProduct={setCurrentProduct} item={item} setColor={setColor} setDragCurrent={setDragCurrent}/>}
             </div>
           ))}
         </div>
@@ -240,15 +199,15 @@ const downloadImage = (blob, fileName) => {
             <img alt="" style={{top: 0, left: 0, width: 700, background: color }} src={`${currentProduct}`}/>
         </div>
         <div
-          id="page-container" 
-          style={{ position: "absolute", top: 0, left: 0, width:'100%'}}
-           onDrop={(e) => {
+          id="page-container"
+          style={{ position: "absolute", top: 0, left: 0, width: "100%" }}
+          onDrop={(e) => {
             e.preventDefault();
             // register event position
             stageRef.current.setPointersPositions(e);
             // add image
 
-            handleDragArtwork()
+            handleDragArtwork();
           }}
           
           onDragOver={(e) => e.preventDefault()}
@@ -311,11 +270,13 @@ const downloadImage = (blob, fileName) => {
         </div>
          
         <div className="absolute top-2 right-2 cursor-pointer" onClick={handleDeleteArtwork}>
-            Delete
+        <i className="fa-solid fa-trash-can text-3xl"></i>
         </div>
-        {
-          selectedId !== null && 
-          <div className="absolute top-2 left-4 cursor-pointer flex" onClick={handleChangeFont}>
+        {selectedId !== null && (
+          <div
+            className="absolute top-2 left-4 cursor-pointer flex"
+            onClick={handleChangeFont}
+          >
             <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">
             <select defaultValue={fontSelected} onChange={(e) => {setFontSelected(e.target.value);  containerRef.current.fontFamily(e.target.value)}}>
               {FONTS.map((x, index) => { return (<option key={index} value={x} >{x}</option>)
@@ -330,7 +291,7 @@ const downloadImage = (blob, fileName) => {
             <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="right"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="right" ? "" : "right"); containerRef.current.align("right");}}><i className="fa-solid fa-align-right"></i></div>
             <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="justify"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="justify" ? "" : "justify"); containerRef.current.align("justify");}}><i className="fa-solid fa-align-justify"></i></div>
         </div>
-        }
+        )}
         
       </div>
       <div className="w-1/4 px-3">
@@ -358,7 +319,28 @@ const downloadImage = (blob, fileName) => {
                 </div>
               ))}
             </div>
-            <div className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500">Tính giá</div>
+            <div className="my-2 text-lg font-bold border border-[#dbdbdb] border-t-0 border-l-0 border-r-0">
+              Tổng cộng
+            </div>
+            <div className="flex justify-between my-1 ">
+              <div className="">Tiền áo:</div>
+              <div className="">135.000 đ</div>
+            </div>
+            <div className="flex justify-between my-1">
+              <div className="">Tiền in:</div>
+              <div className="">100.000 đ</div>
+            </div>
+            <div className="flex justify-between my-1">
+              <div className="">Tiền ảnh:</div>
+              <div className="">135.000 đ</div>
+            </div>
+            <div className="flex justify-between my-1">
+              <div className="">Tổng cộng:</div>
+              <div className="">135.000 đ</div>
+            </div>
+            <div className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500">
+              Thêm vào giỏ hàng
+            </div>
           </div>
         </div>
       </div>
@@ -369,4 +351,3 @@ const downloadImage = (blob, fileName) => {
 export default Home;
 
 const LIST_SIZE = ["XS", "S", "M", "L", "XXl", "XXXl"];
-
