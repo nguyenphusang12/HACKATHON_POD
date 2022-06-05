@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route
-            path="home"
+            path="/"
             element={
               <React.Suspense fallback={<>...</>}>
                 <Home />
