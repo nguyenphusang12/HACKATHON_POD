@@ -127,7 +127,7 @@ const Payment = () => {
               </div>
               <div className="">12(cái)</div>
               <div className="">
-                <i class="fa-solid fa-trash-can"></i>
+                <i className="fa-solid fa-trash-can"></i>
               </div>
               <div className="">685,500đ</div>
             </div>

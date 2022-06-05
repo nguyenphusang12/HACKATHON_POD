@@ -9,7 +9,7 @@ import fram981 from "assets/image/frame981.png";
 import TextDraw from "Components/Common/TextDraw";
 import { FONT_STYLE } from "data/font";
 
-const DetailMenu = ({ item, setColor, setDragCurrent }) => {
+const DetailMenu = ({ item, setColor, setDragCurrent, setCurrentProduct }) => {
   const [body, setBody] = useState();
   const [select, setSelect] = useState();
   const [listImage, setListImage] = useState([]);
@@ -27,7 +27,7 @@ const DetailMenu = ({ item, setColor, setDragCurrent }) => {
         setBody(
           <div className="grid grid-cols-3 gap-3">
             {LIST_TYPE_LAYOUT.map((item, index) => (
-              <div key={index} className=" cursor-pointer">
+              <div key={index} className=" cursor-pointer" onClick={() => setCurrentProduct(item.image)}>
                 <img src={item.icon} alt="" />
                 <div>{item.name}</div>
               </div>
@@ -134,28 +134,40 @@ const DetailMenu = ({ item, setColor, setDragCurrent }) => {
 export default DetailMenu;
 const LIST_TYPE_LAYOUT = [
   {
+    id: 1, 
     name: "Cổ tròn tay dài",
     icon: shirt_1,
+    image: "assets/ao3.png"
   },
   {
+    id: 2, 
     name: "Cổ tròn tay ngắn",
     icon: shirt_2,
+    image: "assets/ao4.png"
   },
   {
+    id: 3, 
     name: "Hoodie tay ngắn",
     icon: shirt_3,
+    image: "assets/ao5.png"
   },
   {
+    id: 4, 
     name: "Cổ bẻ tay ngắn",
     icon: shirt_4,
+    image: "assets/ao6.png"
   },
   {
+    id: 5, 
     name: "Hoodie tay dài",
     icon: shirt_5,
+    image: "assets/ao7.png"
   },
   {
+    id: 6, 
     name: "Cổ tròn tay ngắn nữ",
     icon: shirt_6,
+    image: "assets/ao8.png"
   },
 ];
 const LIST_MATERIALS = [

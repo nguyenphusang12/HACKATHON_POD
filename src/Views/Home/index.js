@@ -12,26 +12,10 @@ import DetailMenu from "Components/DetailMenu";
 import { CirclePicker } from 'react-color';
 import html2canvas from "html2canvas";
 import Text from "Components/KonvaObject/Text";
+import { FONTS } from "data/font";
+import { current } from "@reduxjs/toolkit";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-
-const initialRectangles = [
-  {
-    x: 150,
-    y: 150,
-    width: 100,
-    height: 100,
-    fill: "green",
-    id: "rect2",
-  },
-  {
-    x: 10,
-    y: 10,
-    width: 100,
-    height: 100,
-    fill: "red",
-    id: "rect1",
-  },
-];
 const LIST_BUTTONS_CONTROL = [
   {
     id: 1,
@@ -71,16 +55,19 @@ const LIST_BUTTONS_CONTROL = [
   },
 ];
 const Home = () => {
-  const [rectangles, setRectangles] = React.useState(initialRectangles);
   const [selectedId, selectShape] = React.useState(null);
-  const [width, setWidth] = useState(700);  
-  const [height, setHeight] = useState(685);
   const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
   const [listImageDesign, setListImageDesign] = useState([]);
   const stageRef = React.useRef();
   const containerRef = React.useRef();;
   const [dragCurrent, setDragCurrent] = useState(null);
+  const [fontSelected, setFontSelected] = useState("Roboto");
+  const [bold, setBold] = useState(false);
+  const [italic, setItalic] = useState(false);
+  const [underline, setUndeline] = useState(false);
+  const [position, setPositon] = useState("left");
+  const [currentProduct,setCurrentProduct] = useState("assets/ao3.png");
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -98,9 +85,6 @@ const Home = () => {
     });
   };
  
-  const handleChangeColor = (color) => {
-    setColor(color.hex);
-  };
 
   const handleDownload = () => {
     html2canvas(document.querySelector("#design-container")).then(canvas => {
@@ -193,7 +177,7 @@ const downloadImage = (blob, fileName) => {
                 handleClickMenu={index === 5 ? handleDownload : handleClickMenu}
                 item={item}
                 />
-              {item.isShow && <DetailMenu item={item} setColor={setColor} setDragCurrent={setDragCurrent}/>}
+              {item.isShow && <DetailMenu setCurrentProduct={setCurrentProduct} item={item} setColor={setColor} setDragCurrent={setDragCurrent}/>}
             </>
           ))}
         </div>
@@ -201,7 +185,7 @@ const downloadImage = (blob, fileName) => {
       <div id="design-container" className="w-1/2 overflow-hidden  relative">
 
          <div style={{ width: '100%'}}>
-            <img alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
+            <img alt="" style={{top: 0, left: 0, width: 700, background: color }} src={`${currentProduct}`}/>
         </div>
         <div
           id="page-container" 
@@ -223,9 +207,6 @@ const downloadImage = (blob, fileName) => {
           onTouchStart={checkDeselect}
           ref={stageRef}
         >
-
-
-
           <Layer>
             {listImageDesign.map((item, i) => {
                switch (item.type) {
@@ -234,9 +215,13 @@ const downloadImage = (blob, fileName) => {
                     <Text
                     key={i}
                     pageRef={containerRef}
-                    shapeProps={{ ...item, fill: item.color }}
+                    shapeProps={{ ...item, fill: item.color, fontStyle: item.fontWeight ? item.fontWeight : "normal"}}
                     isSelected={item.id === selectedId}
                     onSelect={() => {
+                      setFontSelected(containerRef.current.fontFamily());
+                      setBold(containerRef.current.fontStyle().includes("bold"))
+                      setItalic(containerRef.current.fontStyle().includes("italic"))
+                      setUndeline(containerRef.current.fontStyle().includes("underline"))
                       selectShape(item.id);
                     }}
                     onChange={(newAttrs) => {
@@ -265,8 +250,6 @@ const downloadImage = (blob, fileName) => {
               }
               
             })}
-            
-            
           </Layer>
         </Stage>
         </div>
@@ -276,9 +259,19 @@ const downloadImage = (blob, fileName) => {
         {
           selectedId !== null && 
           <div className="absolute top-2 left-4 cursor-pointer flex" onClick={handleChangeFont}>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">B</div>
-            <div className="px-2 italic border-2 border-slate-50 bg-white text-black">I</div>
-            <div className="px-2 underline border-2 border-slate-50 bg-white text-black">U</div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">
+            <select defaultValue={fontSelected}>
+              {FONTS.map(x => { return (<option value={x} onChange={(e) => {setFontSelected(e.target.value)}}>{x}</option>)
+              })}
+            </select>
+            </div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: bold?"#CCC":"#FFF" }} onClick={() => {setBold(!bold); bold ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("bold")}}>B</div>
+            <div className="px-2 italic border-2 border-slate-50 bg-white text-black" style={{background: italic?"#CCC":"#FFF" }} onClick={() => {setItalic(!italic); italic ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("italic")}}>I</div>
+            <div className="px-2 underline border-2 border-slate-50 bg-white text-black" style={{background: underline?"#CCC":"#FFF" }} onClick={() => {setUndeline(!underline); containerRef.current.fontStyle("underline")}}>U</div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="left"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="left" ? "" : "left"); containerRef.current.align("left");}}><i class="fa-solid fa-align-left"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="center"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="center" ? "" : "center"); containerRef.current.align("center");}}><i class="fa-solid fa-align-center"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="right"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="right" ? "" : "right"); containerRef.current.align("right");}}><i class="fa-solid fa-align-right"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="justify"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="justify" ? "" : "justify"); containerRef.current.align("justify");}}><i class="fa-solid fa-align-justify"></i></div>
         </div>
         }
         

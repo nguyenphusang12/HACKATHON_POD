@@ -57,3 +57,13 @@ export const FONT_STYLE = [
         "text": "Đây là text",
     }
 ] 
+
+export const FONTS = [
+    "Montserrat",
+    "Kavivanar",
+    "Open Sans",
+    "STIX Two Text",
+    "Podkova",
+    "Rokkitt", 
+    "Roboto"
+]

@@ -130,8 +130,8 @@ const Text = ({ shapeProps, isSelected, onSelect, onChange, pageRef }) => {
         <KonvaText
           onClick={
               (e) => {
-                onSelect()
                 pageRef.current = e.target
+                onSelect()
               }
               
             }
