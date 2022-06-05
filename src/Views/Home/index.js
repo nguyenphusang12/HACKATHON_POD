@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Stage, Layer } from "react-konva";
 import ItemMenu from "Components/ItemMenu";
 import ArkworkImage from "Components/KonvaObject/ArkworkImage";
@@ -13,7 +13,8 @@ import html2canvas from "html2canvas";
 import Text from "Components/KonvaObject/Text";
 import { FONTS } from "data/font";
 import { useDispatch } from "react-redux";
-import { setTitlePage } from "Store";
+import { setTitlePage, addProduct } from "Store";
+import { toast } from "react-toastify";
 import { getPrice } from "Api";
 
 const LIST_BUTTONS_CONTROL = [
@@ -57,7 +58,7 @@ const LIST_BUTTONS_CONTROL = [
 const Home = () => {
   const dispatch = useDispatch();
   const [selectedId, selectShape] = React.useState(null);
-  const [color, setColor] = useState("red");
+  const [color, setColor] = useState("");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
   const [listImageDesign, setListImageDesign] = useState([]);
   const stageRef = React.useRef();
@@ -69,13 +70,31 @@ const Home = () => {
   const [underline, setUndeline] = useState(false);
   const [position, setPositon] = useState("left");
   const [currentProduct, setCurrentProduct] = useState("assets/ao3.png");
-  const [selectProduct, setSelectProduct] = useState({
+  const [select, setSelect] = useState();
+  const [typePr, setTypePro] = useState();
+  const [qualitySize, setQualitySize] = useState({});
+  const props = useRef({
     image: "",
     type: "",
-    quanlity: "",
-    quantity: null,
     price: null,
   });
+  const handleChangeQuality = (e) => {
+    setQualitySize({ ...qualitySize, [e.target.name]: e.target.value });
+  };
+  useEffect(() => {
+    props.current = {
+      ...props.current,
+      image: currentProduct,
+      type: select?.desc,
+      ...qualitySize,
+      name: typePr,
+      value: Object.values(qualitySize).reduce((pre, cur) => pre + Number(cur), 0),
+    };
+  }, [currentProduct, select, qualitySize, typePr]);
+  const addProductToCart = () => {
+    toast("Thêm giỏ hàng thành công!");
+    dispatch(addProduct(props.current));
+  };
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -121,7 +140,6 @@ const Home = () => {
   const handleChangeFont = () => {};
 
   const handleDragArtwork = () => {
-    console.log(dragCurrent);
     switch (dragCurrent.type) {
       case "text":
         let texts = listImageDesign.concat([
@@ -188,6 +206,9 @@ const Home = () => {
                   item={item}
                   setColor={setColor}
                   setDragCurrent={setDragCurrent}
+                  select={select}
+                  setSelect={setSelect}
+                  setTypePro={setTypePro}
                 />
               )}
             </>
@@ -403,8 +424,9 @@ const Home = () => {
                   <div className="w-full rounded border-[1px] border-gray-300">
                     <input
                       type="text"
-                      name=""
+                      name={item}
                       id=""
+                      onChange={handleChangeQuality}
                       className="w-full px-1 outline-none"
                       placeholder="0"
                     />
@@ -431,7 +453,10 @@ const Home = () => {
               <div className="">Tổng cộng:</div>
               <div className="">135.000 đ</div>
             </div>
-            <div className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500">
+            <div
+              onClick={addProductToCart}
+              className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500"
+            >
               Thêm vào giỏ hàng
             </div>
           </div>

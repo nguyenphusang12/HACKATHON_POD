@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 
 const Layout = () => {
   const titlePage = useSelector((state) => state.product.titlePage);
+  const products = useSelector((state) => state.product.products);
   const [showModal, setShowModal] = useState(false);
   let navigate = useNavigate();
   const goHome = () => {
@@ -13,7 +14,7 @@ const Layout = () => {
   };
   const goPayment = () => {
     navigate("/payment");
-    setShowModal(false)
+    setShowModal(false);
   };
   return (
     <div className="max-w-7xl w-full px-4 mx-auto">
@@ -25,11 +26,9 @@ const Layout = () => {
       )}
       <div className="w-full relative h-20 flex items-center justify-center">
         <div className="absolute left-0 cursor-pointer" onClick={goHome}>
-          <img src={logoYody} alt="Yo" className="w-24"/>
+          <img src={logoYody} alt="Yo" className="w-24" />
         </div>
-        <div className="text-2xl text-2xl font-bold">
-          {titlePage}
-        </div>
+        <div className="text-2xl text-2xl font-bold">{titlePage}</div>
         <div className="absolute right-0 ">
           {showModal && (
             <div className="block border-[20px] border-l-transparent border-t-transparent border-r-transparent border-b-white absolute top-2 -right-2 z-[2]"></div>
@@ -39,26 +38,31 @@ const Layout = () => {
           </div>
           {showModal && (
             <div className="absolute top-[calc(100%+15px)] -right-3 w-96 max-h-96 px-2 pb-2 bg-white rounded-md z-10 overflow-auto">
-              <div className="flex py-3 h-24 border-b border-solid border-gray-400">
-                <div className="w-20">
-                  <img
-                    src="https://bienthuy.com/bienthuy-img/2020/04/pexels-photo-675920-scaled.jpeg"
-                    alt=""
-                    className="w-full h-full object-cover rounded"
-                  />
-                </div>
-                <div className="text-left flex-1 px-2 text-sm">
-                  <div className="font-bold text-base">Áo bóng chày</div>
-                  <div>95% cotton, 5% spandex</div>
-                  <div>Số lượng: 12</div>
-                </div>
-                <div className="">
-                  <div>685,500đ</div>
-                  <div className="cursor-pointer active:opacity-80">
-                    <i className="fa-solid fa-trash-can"></i>
+              {products.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex py-3 h-24 border-b border-solid border-gray-400"
+                >
+                  <div className="w-20">
+                    <img
+                      src={item.image}
+                      alt=""
+                      className="w-full h-full object-cover rounded"
+                    />
+                  </div>
+                  <div className="text-left flex-1 px-2 text-sm">
+                    <div className="font-bold text-base">{item.name}</div>
+                    <div>{item.type}</div>
+                    <div>Số lượng: {item.value}</div>
+                  </div>
+                  <div className="">
+                    <div>685,500đ</div>
+                    <div className="cursor-pointer active:opacity-80">
+                      <i className="fa-solid fa-trash-can"></i>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
 
               <div className="text-right font-bold my-1">Tổng: 8,000,000 đ</div>
               <div className="flex justify-between">

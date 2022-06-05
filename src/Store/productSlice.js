@@ -5,11 +5,7 @@ export const productSlice = createSlice({
   initialState: {
     productSelect: null,
     titlePage: "",
-    products: [
-      {
-        name: "Vay",
-      },
-    ],
+    products: [],
   },
   reducers: {
     addProduct: (state, actions) => {
@@ -18,12 +14,12 @@ export const productSlice = createSlice({
     deleteProduct: (state) => {
       state.products.splice(state.products.length - 1, 1);
     },
-    setTitlePage: (state,actions) =>{
+    setTitlePage: (state, actions) => {
       state.titlePage = actions.payload;
-    }
+    },
   },
 });
 
-export const { addProduct, deleteProduct ,setTitlePage} = productSlice.actions;
+export const { addProduct, deleteProduct, setTitlePage } = productSlice.actions;
 
 export default productSlice.reducer;

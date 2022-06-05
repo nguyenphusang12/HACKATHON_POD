@@ -1,14 +1,18 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 const Home = React.lazy(() => import("Views/Home"));
 const About = React.lazy(() => import("Views/About"));
 const Payment = React.lazy(() => import("Views/Payment"));
 const Layout = React.lazy(() => import("Components/Layout"));
 
+
 function App() {
   return (
     <div className="App">
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route

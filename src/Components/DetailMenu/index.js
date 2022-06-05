@@ -9,17 +9,25 @@ import fram981 from "assets/image/frame981.png";
 import TextDraw from "Components/Common/TextDraw";
 import { FONT_STYLE } from "data/font";
 
-const DetailMenu = ({ item, setColor, setDragCurrent, setCurrentProduct }) => {
+const DetailMenu = ({
+  item,
+  setColor,
+  setDragCurrent,
+  setCurrentProduct,
+  select,
+  setSelect,
+  setTypePro
+}) => {
   const [body, setBody] = useState();
-  const [select, setSelect] = useState();
+
   const [listImage, setListImage] = useState([]);
   useEffect(() => {
-    let images = []
-    for (var i=1067; i<1080; i++) {
-      images.push({id: i, src:  `../../assets/artwork/${i}.png`})
+    let images = [];
+    for (var i = 1067; i < 1080; i++) {
+      images.push({ id: i, src: `../../assets/artwork/${i}.png` });
     }
     setListImage(images);
-  }, [])
+  }, []);
 
   useEffect(() => {
     switch (item.id) {
@@ -27,7 +35,14 @@ const DetailMenu = ({ item, setColor, setDragCurrent, setCurrentProduct }) => {
         setBody(
           <div className="grid grid-cols-3 gap-3">
             {LIST_TYPE_LAYOUT.map((item, index) => (
-              <div key={index} className=" cursor-pointer" onClick={() => setCurrentProduct(item.image)}>
+              <div
+                key={index}
+                className=" cursor-pointer"
+                onClick={() => {
+                  setCurrentProduct(item.image);
+                  setTypePro(item.name);
+                }}
+              >
                 <img src={item.icon} alt="" />
                 <div>{item.name}</div>
               </div>
@@ -68,7 +83,7 @@ const DetailMenu = ({ item, setColor, setDragCurrent, setCurrentProduct }) => {
                   {select.color.map((item, index) => (
                     <button
                       key={index}
-                      className="w-3 h-3 mr-1 text-sm first:ml-1 rounded-full"
+                      className="w-4 h-4 mr-1 text-sm first:ml-1 rounded-full"
                       style={{ background: item }}
                       onClick={() => setColor(item)}
                     ></button>
@@ -83,18 +98,33 @@ const DetailMenu = ({ item, setColor, setDragCurrent, setCurrentProduct }) => {
       case 3:
         setBody(
           <div className="grid grid-cols-2 gap-1">
-            {FONT_STYLE.map(font => (
-              <TextDraw 
-              {...font} 
-              draggable={true} 
-              onDragStart={(e) => {
-                if (font.otherText) {
-                  setDragCurrent({...font, type: "text", width: e.target.children[0].clientWidth, height: e.target.children[0].clientHeight, otherText:{...font.otherText, width: e.target.children[1].clientWidth, height: e.target.children[1].clientHeight} });
-                } else {
-                  setDragCurrent({...font, type: "text", width: e.target.clientWidth, height: e.target.clientHeight});
-                }
-                
-              }}></TextDraw>
+            {FONT_STYLE.map((font) => (
+              <TextDraw
+                {...font}
+                draggable={true}
+                onDragStart={(e) => {
+                  if (font.otherText) {
+                    setDragCurrent({
+                      ...font,
+                      type: "text",
+                      width: e.target.children[0].clientWidth,
+                      height: e.target.children[0].clientHeight,
+                      otherText: {
+                        ...font.otherText,
+                        width: e.target.children[1].clientWidth,
+                        height: e.target.children[1].clientHeight,
+                      },
+                    });
+                  } else {
+                    setDragCurrent({
+                      ...font,
+                      type: "text",
+                      width: e.target.clientWidth,
+                      height: e.target.clientHeight,
+                    });
+                  }
+                }}
+              ></TextDraw>
             ))}
           </div>
         );
@@ -102,20 +132,23 @@ const DetailMenu = ({ item, setColor, setDragCurrent, setCurrentProduct }) => {
       case 4:
         setBody(
           <div className="grid grid-cols-2 gap-1">
-            {listImage && listImage.map((item) => {
-              return (
-              <div className="cursor-pointer">
-                <img 
-                key={item.id}
-                src={item.src} 
-                alt="item" 
-                draggable="true"
-                onDragStart={(e) => {
-                  setDragCurrent({...item, type: "artwork"});
-                  // dragUrl.current = e.target.src;
-                }}/>
-              </div>
-            )})}
+            {listImage &&
+              listImage.map((item) => {
+                return (
+                  <div className="cursor-pointer">
+                    <img
+                      key={item.id}
+                      src={item.src}
+                      alt="item"
+                      draggable="true"
+                      onDragStart={(e) => {
+                        setDragCurrent({ ...item, type: "artwork" });
+                        // dragUrl.current = e.target.src;
+                      }}
+                    />
+                  </div>
+                );
+              })}
           </div>
         );
         return;
@@ -134,40 +167,40 @@ const DetailMenu = ({ item, setColor, setDragCurrent, setCurrentProduct }) => {
 export default DetailMenu;
 const LIST_TYPE_LAYOUT = [
   {
-    id: 1, 
+    id: 1,
     name: "Cổ tròn tay dài",
     icon: shirt_1,
-    image: "assets/ao3.png"
+    image: "assets/ao3.png",
   },
   {
-    id: 2, 
+    id: 2,
     name: "Cổ tròn tay ngắn",
     icon: shirt_2,
-    image: "assets/ao4.png"
+    image: "assets/ao4.png",
   },
   {
-    id: 3, 
+    id: 3,
     name: "Hoodie tay ngắn",
     icon: shirt_3,
-    image: "assets/ao5.png"
+    image: "assets/ao5.png",
   },
   {
-    id: 4, 
+    id: 4,
     name: "Cổ bẻ tay ngắn",
     icon: shirt_4,
-    image: "assets/ao6.png"
+    image: "assets/ao6.png",
   },
   {
-    id: 5, 
+    id: 5,
     name: "Hoodie tay dài",
     icon: shirt_5,
-    image: "assets/ao7.png"
+    image: "assets/ao7.png",
   },
   {
-    id: 6, 
+    id: 6,
     name: "Cổ tròn tay ngắn nữ",
     icon: shirt_6,
-    image: "assets/ao8.png"
+    image: "assets/ao8.png",
   },
 ];
 const LIST_MATERIALS = [

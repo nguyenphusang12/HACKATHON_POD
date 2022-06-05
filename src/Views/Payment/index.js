@@ -1,12 +1,21 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setTitlePage } from "Store";
+import { toast } from "react-toastify";
+import thumali from "assets/image/thumbnail.jfif";
+import { useNavigate } from "react-router-dom";
 
 const Payment = () => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  let navigate = useNavigate();
+  const products = useSelector((state) => state.product.products);
   useEffect(() => {
     dispatch(setTitlePage("Thanh toán"));
   }, []);
+  const handlePaymemt = () => {
+    toast("Thanh toán thành công!");
+    navigate("/");
+  };
   return (
     <div className="w-4/5 mx-auto">
       <div className="text-xl font-bold text-left text-[#11006F]">
@@ -164,9 +173,9 @@ const Payment = () => {
           </form>
           <div className="h-full">
             <img
-              src="https://tackexinh.com/wp-content/uploads/2021/03/hinh-nen-girl-xinh-4k-cho-pc-03.jpg"
+              src={thumali}
               alt=""
-              className="h-full object-cover rounded-lg"
+              className="h-[340px] object-cover w-full rounded-lg"
             />
           </div>
         </div>
@@ -184,63 +193,27 @@ const Payment = () => {
         <hr />
         <div className="">
           <div className="">
-            <div className="flex text-left items-center py-2">
-              <div className="flex-1 h-full flex text-left">
-                <img
-                  src="https://haycafe.vn/wp-content/uploads/2022/02/Anh-gai-xinh-chau-Au-My.jpg"
-                  alt=""
-                  className="w-16 h-full rounded-md mr-2"
-                />
-                <div className="text-sm break-all">
-                  <div className="">Áo Bóng Chày</div>
-                  <div className="">95% cotton, 5% spandex</div>
-                  <div>Size áo - Số lượng: XS-02;XL-10</div>
+            {products.map((item, index) => (
+              <div key={index} className="flex text-left items-center py-2">
+                <div className="flex-1 h-full flex text-left">
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="w-16 h-full rounded-md mr-2"
+                  />
+                  <div className="text-sm break-all">
+                    <div className="">{item.name}</div>
+                    <div className="">{item.type}</div>
+                    <div>SSố lượng: {item.value}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1 text-right">12(cái)</div>
-              <div className="flex-1 text-right">
-                <i className="fa-solid fa-trash-can"></i>
-              </div>
-              <div className="flex-1 text-right">685,500đ</div>
-            </div>
-            <div className="flex text-left items-center py-2">
-              <div className="flex-1 h-full flex text-left">
-                <img
-                  src="https://haycafe.vn/wp-content/uploads/2022/02/Anh-gai-xinh-chau-Au-My.jpg"
-                  alt=""
-                  className="w-16 h-full rounded-md mr-2"
-                />
-                <div className="text-sm break-all">
-                  <div className="">Áo Bóng Chày</div>
-                  <div className="">95% cotton, 5% spandex</div>
-                  <div>Size áo - Số lượng: XS-02;XL-10</div>
+                <div className="flex-1 text-right">12(cái)</div>
+                <div className="flex-1 text-right">
+                  <i className="fa-solid fa-trash-can"></i>
                 </div>
+                <div className="flex-1 text-right">685,500đ</div>
               </div>
-              <div className="flex-1 text-right">12(cái)</div>
-              <div className="flex-1 text-right">
-                <i class="fa-solid fa-trash-can"></i>
-              </div>
-              <div className="flex-1 text-right">685,500đ</div>
-            </div>
-            <div className="flex text-left items-center py-2">
-              <div className="flex-1 h-full flex text-left">
-                <img
-                  src="https://haycafe.vn/wp-content/uploads/2022/02/Anh-gai-xinh-chau-Au-My.jpg"
-                  alt=""
-                  className="w-16 h-full rounded-md mr-2"
-                />
-                <div className="text-sm break-all">
-                  <div className="">Áo Bóng Chày</div>
-                  <div className="">95% cotton, 5% spandex</div>
-                  <div>Size áo - Số lượng: XS-02;XL-10</div>
-                </div>
-              </div>
-              <div className="flex-1 text-right">12(cái)</div>
-              <div className="flex-1 text-right">
-                <i class="fa-solid fa-trash-can"></i>
-              </div>
-              <div className="flex-1 text-right">685,500đ</div>
-            </div>
+            ))}
           </div>
           <hr />
         </div>
@@ -261,7 +234,10 @@ const Payment = () => {
           </div>
         </div>
       </div>
-      <div className="w-32 py-3 my-2 ml-auto rounded-md bg-[#0C5DFF] text-white">
+      <div
+        className="w-32 py-3 my-2 ml-auto rounded-md bg-[#0C5DFF] text-white cursor-pointer"
+        onClick={handlePaymemt}
+      >
         Thanh toán
       </div>
     </div>
