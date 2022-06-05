@@ -113,12 +113,12 @@ const Home = () => {
   };
 
   const handleDownload = () => {
-    html2canvas(document.querySelector("#design-container")).then((canvas) => {
-      const image = canvas.toDataURL("image/png", 1.0);
-      downloadImage(image, "design");
-    });
-  };
-  const downloadImage = (blob, fileName) => {
+    html2canvas(document.querySelector("#download-image")).then(canvas => {
+      const image = canvas.toDataURL("image/png", 1.0)
+      downloadImage(image, "design")
+  });
+};
+const downloadImage = (blob, fileName) => {
     const fakeLink = window.document.createElement("a");
     fakeLink.style = "display:none;";
     fakeLink.download = fileName;
@@ -133,12 +133,19 @@ const Home = () => {
   };
 
   const handleDeleteArtwork = () => {
-    const images = listImageDesign.filter((x) => x.id != selectedId);
-    setListImageDesign(images);
-  };
+    const images = listImageDesign.filter(x => x.id !== selectedId);
+    setListImageDesign(images)
+    selectShape(null)
+  }
 
-  const handleChangeFont = () => {};
-
+  const handleChangeFont = () => {
+    
+  }
+  const handleOnKeyDown = (e) => {
+    if (e.keyCode === 8 || e.keyCode === 46) {
+      handleDeleteArtwork()
+    } 
+  }
   const handleDragArtwork = () => {
     switch (dragCurrent.type) {
       case "text":
@@ -172,8 +179,8 @@ const Home = () => {
             {
               id: new Date().getTime(),
               ...stageRef.current.getPointerPosition(),
-              width: 150,
-              height: 150,
+              width: dragCurrent.useDefault ? 150 : dragCurrent.width,
+              height: dragCurrent.useDefault ? 150 : dragCurrent.height,
               src: dragCurrent.src,
               type: "artwork",
             },
@@ -192,9 +199,8 @@ const Home = () => {
       <div className="flex w-1/4">
         <div className="w-11/12 mx-auto px-2">
           {listButtons.map((item, index) => (
-            <>
+            <div key={index}>
               <ItemMenu
-                key={index}
                 title={item.title}
                 icon={item.icon}
                 handleClickMenu={index === 5 ? handleDownload : handleClickMenu}
@@ -211,17 +217,14 @@ const Home = () => {
                   setTypePro={setTypePro}
                 />
               )}
-            </>
+            </div>
           ))}
         </div>
       </div>
-      <div id="design-container" className="w-1/2 overflow-hidden  relative">
-        <div style={{ width: "100%" }}>
-          <img
-            alt=""
-            style={{ top: 0, left: 0, width: 700, background: color }}
-            src={`${currentProduct}`}
-          />
+      <div id="design-container" className="w-1/2 overflow-hidden relative">
+        <div id="download-image">
+        <div style={{ width: '100%'}}>
+            <img alt="" style={{top: 0, left: 0, width: 700, background: color }} src={`${currentProduct}`}/>
         </div>
         <div
           id="page-container"
@@ -234,81 +237,68 @@ const Home = () => {
 
             handleDragArtwork();
           }}
+          
           onDragOver={(e) => e.preventDefault()}
+          onKeyDown={handleOnKeyDown}
+          tabIndex={-1}
         >
-          <Stage
-            width={window.innerWidth}
-            height={window.innerHeight}
-            onMouseDown={checkDeselect}
-            onTouchStart={checkDeselect}
-            ref={stageRef}
-          >
-            <Layer>
-              {listImageDesign.map((item, i) => {
-                switch (item.type) {
-                  case "text":
-                    return (
-                      <Text
-                        key={i}
-                        pageRef={containerRef}
-                        shapeProps={{
-                          ...item,
-                          fill: item.color,
-                          fontStyle: item.fontWeight
-                            ? item.fontWeight
-                            : "normal",
-                        }}
-                        isSelected={item.id === selectedId}
-                        onSelect={() => {
-                          setFontSelected(containerRef.current.fontFamily());
-                          setBold(
-                            containerRef.current.fontStyle().includes("bold")
-                          );
-                          setItalic(
-                            containerRef.current.fontStyle().includes("italic")
-                          );
-                          setUndeline(
-                            containerRef.current
-                              .fontStyle()
-                              .includes("underline")
-                          );
-                          selectShape(item.id);
-                        }}
-                        onChange={(newAttrs) => {
-                          const images = listImageDesign.slice();
-                          images[i] = newAttrs;
-                          setListImageDesign(images);
-                        }}
-                      />
-                    );
-                  case "artwork":
-                    return (
-                      <ArkworkImage
-                        key={i}
-                        shapeProps={item}
-                        isSelected={item.id === selectedId}
-                        onSelect={() => {
-                          selectShape(item.id);
-                        }}
-                        onChange={(newAttrs) => {
-                          const images = listImageDesign.slice();
-                          images[i] = newAttrs;
-                          setListImageDesign(images);
-                        }}
-                      />
-                    );
-                  default:
-                    return <></>;
-                }
-              })}
-            </Layer>
-          </Stage>
+        <Stage
+          width={window.innerWidth}
+          height={window.innerHeight}
+          onMouseDown={checkDeselect}
+          onTouchStart={checkDeselect}
+          ref={stageRef}
+        >
+          <Layer>
+            {listImageDesign.map((item, i) => {
+               switch (item.type) {
+                case "text":
+                  return (
+                    <Text
+                    key={i}
+                    pageRef={containerRef}
+                    shapeProps={{ ...item, fill: item.color, fontStyle: item.fontWeight ? item.fontWeight : "normal"}}
+                    isSelected={item.id === selectedId}
+                    onSelect={() => {
+                      setFontSelected(containerRef.current.fontFamily());
+                      setBold(containerRef.current.fontStyle().includes("bold"))
+                      setItalic(containerRef.current.fontStyle().includes("italic"))
+                      setUndeline(containerRef.current.fontStyle().includes("underline"))
+                      selectShape(item.id);
+                    }}
+                    onChange={(newAttrs) => {
+                    const images = listImageDesign.slice();
+                    images[i] = newAttrs;
+                    setListImageDesign(images);
+                  }}
+                  />)
+                case "artwork":
+                  return (
+                    <ArkworkImage
+                    key={i}
+                    shapeProps={item}
+                    isSelected={item.id === selectedId}
+                    onSelect={() => {
+                      selectShape(item.id);
+                    }}
+                  onChange={(newAttrs) => {
+                    const images = listImageDesign.slice();
+                    images[i] = newAttrs;
+                    setListImageDesign(images);
+                  }}
+                  />)
+                default:
+                  return <div key={i}></div>;
+              }
+              
+            })}
+          </Layer>
+        </Stage>
         </div>
-        <div
-          className="absolute top-2 right-2 cursor-pointer"
-          onClick={handleDeleteArtwork}
-        >
-          <i className="fa-solid fa-trash-can text-3xl"></i>
+        </div>
+         
+        <div className="absolute top-2 right-2 cursor-pointer" onClick={handleDeleteArtwork}>
+        <i className="fa-solid fa-trash-can text-3xl"></i>
         </div>
         {selectedId !== null && (
           <div
@@ -316,97 +306,21 @@ const Home = () => {
             onClick={handleChangeFont}
           >
             <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">
-              <select defaultValue={fontSelected}>
-                {FONTS.map((x) => {
-                  return (
-                    <option
-                      value={x}
-                      onChange={(e) => {
-                        setFontSelected(e.target.value);
-                      }}
-                    >
-                      {x}
-                    </option>
-                  );
-                })}
-              </select>
+            <select defaultValue={fontSelected} onChange={(e) => {setFontSelected(e.target.value);  containerRef.current.fontFamily(e.target.value)}}>
+              {FONTS.map((x, index) => { return (<option key={index} value={x} >{x}</option>)
+              })}
+            </select>
             </div>
-            <div
-              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
-              style={{ background: bold ? "#CCC" : "#FFF" }}
-              onClick={() => {
-                setBold(!bold);
-                bold
-                  ? containerRef.current.fontStyle("normal")
-                  : containerRef.current.fontStyle("bold");
-              }}
-            >
-              B
-            </div>
-            <div
-              className="px-2 italic border-2 border-slate-50 bg-white text-black"
-              style={{ background: italic ? "#CCC" : "#FFF" }}
-              onClick={() => {
-                setItalic(!italic);
-                italic
-                  ? containerRef.current.fontStyle("normal")
-                  : containerRef.current.fontStyle("italic");
-              }}
-            >
-              I
-            </div>
-            <div
-              className="px-2 underline border-2 border-slate-50 bg-white text-black"
-              style={{ background: underline ? "#CCC" : "#FFF" }}
-              onClick={() => {
-                setUndeline(!underline);
-                containerRef.current.fontStyle("underline");
-              }}
-            >
-              U
-            </div>
-            <div
-              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
-              style={{ background: position === "left" ? "#CCC" : "#FFF" }}
-              onClick={() => {
-                setPositon(position === "left" ? "" : "left");
-                containerRef.current.align("left");
-              }}
-            >
-              <i class="fa-solid fa-align-left"></i>
-            </div>
-            <div
-              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
-              style={{ background: position === "center" ? "#CCC" : "#FFF" }}
-              onClick={() => {
-                setPositon(position === "center" ? "" : "center");
-                containerRef.current.align("center");
-              }}
-            >
-              <i class="fa-solid fa-align-center"></i>
-            </div>
-            <div
-              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
-              style={{ background: position === "right" ? "#CCC" : "#FFF" }}
-              onClick={() => {
-                setPositon(position === "right" ? "" : "right");
-                containerRef.current.align("right");
-              }}
-            >
-              <i class="fa-solid fa-align-right"></i>
-            </div>
-            <div
-              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
-              style={{ background: position === "justify" ? "#CCC" : "#FFF" }}
-              onClick={() => {
-                setPositon(position === "justify" ? "" : "justify");
-                containerRef.current.align("justify");
-              }}
-            >
-              <i class="fa-solid fa-align-justify"></i>
-            </div>
-          </div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: bold?"#CCC":"#FFF" }} onClick={() => {setBold(!bold); bold ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("bold")}}>B</div>
+            <div className="px-2 italic border-2 border-slate-50 bg-white text-black" style={{background: italic?"#CCC":"#FFF" }} onClick={() => {setItalic(!italic); italic ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("italic")}}>I</div>
+            <div className="px-2 underline border-2 border-slate-50 bg-white text-black" style={{background: underline?"#CCC":"#FFF" }} onClick={() => {setUndeline(!underline); containerRef.current.fontStyle("underline")}}>U</div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="left"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="left" ? "" : "left"); containerRef.current.align("left");}}><i className="fa-solid fa-align-left"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="center"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="center" ? "" : "center"); containerRef.current.align("center");}}><i className="fa-solid fa-align-center"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="right"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="right" ? "" : "right"); containerRef.current.align("right");}}><i className="fa-solid fa-align-right"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="justify"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="justify" ? "" : "justify"); containerRef.current.align("justify");}}><i className="fa-solid fa-align-justify"></i></div>
+        </div>
         )}
+        
       </div>
       <div className="w-1/4 px-3">
         <div className="text-left w-full h-4/5 px-3">

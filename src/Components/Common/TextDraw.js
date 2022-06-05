@@ -1,6 +1,4 @@
 import React from "react";
-import iconAdd from "assets/image/Shape_6.png";
-import minusIcon from "assets/image/minus.svg";
 
 const TextDraw = ( props ) => {
   return (

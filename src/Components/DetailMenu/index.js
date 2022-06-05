@@ -21,6 +21,8 @@ const DetailMenu = ({
   const [body, setBody] = useState();
 
   const [listImage, setListImage] = useState([]);
+  const [imgSrc, setImgSrc] = useState("");
+
   useEffect(() => {
     let images = [];
     for (var i = 1067; i < 1080; i++) {
@@ -28,6 +30,26 @@ const DetailMenu = ({
     }
     setListImage(images);
   }, []);
+
+  const handleFileRead = async (event) => {
+    const file = event.target.files[0]
+    const base64 = await convertBase64(file)
+    console.log(base64)
+    setImgSrc(base64)
+  }
+
+  const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file)
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      }
+      fileReader.onerror = (error) => {
+        reject(error);
+      }
+    })
+  }
 
   useEffect(() => {
     switch (item.id) {
@@ -54,8 +76,8 @@ const DetailMenu = ({
         setBody(
           <div className="p-3">
             <div className="grid grid-cols-2 gap-3">
-              {LIST_MATERIALS.map((item) => (
-                <div onClick={() => setSelect(item)} className="cursor-pointer">
+              {LIST_MATERIALS.map((item, index) => (
+                <div key={index} onClick={() => setSelect(item)} className="cursor-pointer">
                   <div className="relative">
                     <img src={fram981} alt="gbc" className="mb-2" />
                     <div className="text-white absolute bottom-0 right-0 text-xs p-1 rounded bg-[rgba(0,0,0,.7)]">
@@ -98,33 +120,21 @@ const DetailMenu = ({
       case 3:
         setBody(
           <div className="grid grid-cols-2 gap-1">
-            {FONT_STYLE.map((font) => (
-              <TextDraw
-                {...font}
-                draggable={true}
-                onDragStart={(e) => {
-                  if (font.otherText) {
-                    setDragCurrent({
-                      ...font,
-                      type: "text",
-                      width: e.target.children[0].clientWidth,
-                      height: e.target.children[0].clientHeight,
-                      otherText: {
-                        ...font.otherText,
-                        width: e.target.children[1].clientWidth,
-                        height: e.target.children[1].clientHeight,
-                      },
-                    });
-                  } else {
-                    setDragCurrent({
-                      ...font,
-                      type: "text",
-                      width: e.target.clientWidth,
-                      height: e.target.clientHeight,
-                    });
-                  }
-                }}
-              ></TextDraw>
+            {FONT_STYLE.map((font, index) => (
+              <TextDraw 
+              {...font} 
+              key={index}
+              draggable={true} 
+              onDragStart={(e) => {
+                if (font.otherText) {
+                  setDragCurrent({...font, type: "text", width: e.target.children[0].clientWidth, height: e.target.children[0].clientHeight, otherText:{...font.otherText, width: e.target.children[1].clientWidth, height: e.target.children[1].clientHeight} });
+                } else {
+                  setDragCurrent({...font, type: "text", width: e.target.clientWidth, height: e.target.clientHeight});
+                }  
+              }}
+              >
+
+              </TextDraw>
             ))}
           </div>
         );
@@ -132,30 +142,54 @@ const DetailMenu = ({
       case 4:
         setBody(
           <div className="grid grid-cols-2 gap-1">
-            {listImage &&
-              listImage.map((item) => {
-                return (
-                  <div className="cursor-pointer">
-                    <img
-                      key={item.id}
-                      src={item.src}
-                      alt="item"
-                      draggable="true"
-                      onDragStart={(e) => {
-                        setDragCurrent({ ...item, type: "artwork" });
-                        // dragUrl.current = e.target.src;
-                      }}
-                    />
-                  </div>
-                );
-              })}
+            {listImage && listImage.map((item, index) => {
+              return (
+              <div className="cursor-pointer" key={index}>
+                <img 
+                src={item.src} 
+                alt="item" 
+                draggable="true"
+                onDragStart={(e) => {
+                  setDragCurrent({...item, useDefault: true, type: "artwork"});
+                  // dragUrl.current = e.target.src;
+                }}
+               ></img>
+              </div>
+            )})}
+          </div>
+        );
+        return;
+      case 5:
+        setBody(
+          <div>
+            <div className="p-2">
+              <input
+                  id="originalFileName"
+                  type="file"
+                  inputProps={{ accept: 'image/*, .xlsx, .xls, .csv, .pdf, .pptx, .pptm, .ppt' }}
+                  required
+                  label="Document"
+                  name="originalFileName"
+                  onChange={e => handleFileRead(e)}
+                  size="small"
+                  variant="standard"
+                />
+            </div>
+            <img src={imgSrc} alt="" draggable="true"
+                onDragStart={(e) => {
+                  setDragCurrent({id: new Date().getTime(), src: imgSrc, height:e.target.clientHeight, width: e.target.clientWidth, type: "artwork"});
+                  // dragUrl.current = e.target.src;
+                }}
+              ></img>
           </div>
         );
         return;
       default:
         return;
     }
-  }, [select, listImage]);
+
+    // eslint-disable-next-line
+  }, [select, listImage, imgSrc]);
 
   return (
     <div className="h-auto max-h-64 overflow-auto">
