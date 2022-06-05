@@ -1,10 +1,54 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setTitlePage } from "Store";
 
 const Payment = () => {
+    const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(setTitlePage("Thanh toán"));
+  }, []);
   return (
     <div className="w-4/5 mx-auto">
-      <div className="text-xl font-bold text-left">Địa chỉ nhận hàng</div>
+      <div className="text-xl font-bold text-left text-[#11006F]">
+        Thông tin giao hàng
+      </div>
       <div className="text-left">
+        <label htmlFor="adresssID" className="text-xs text-gray-300 block my-2">
+          Họ và tên
+        </label>
+        <div className="border rounded-md border-[#dbdbdb]">
+          <input
+            type="text"
+            name=""
+            placeholder="Họ và tên"
+            id="adresssID"
+            className="h-8 px-2 text-sm w-full rounded-md outline-none"
+          />
+        </div>
+        <label htmlFor="adresssID" className="text-xs text-gray-300 block my-2">
+          Số điên thoại
+        </label>
+        <div className="border rounded-md border-[#dbdbdb]">
+          <input
+            type="text"
+            name=""
+            placeholder="Số điên thoại"
+            id="adresssID"
+            className="h-8 px-2 text-sm w-full rounded-md outline-none"
+          />
+        </div>
+        <label htmlFor="adresssID" className="text-xs text-gray-300 block my-2">
+          Email
+        </label>
+        <div className="border rounded-md border-[#dbdbdb]">
+          <input
+            type="text"
+            name=""
+            placeholder="Email"
+            id="adresssID"
+            className="h-8 px-2 text-sm w-full rounded-md outline-none"
+          />
+        </div>
         <label htmlFor="adresssID" className="text-xs text-gray-300 block my-2">
           Địa chỉ
         </label>
@@ -128,7 +172,7 @@ const Payment = () => {
         </div>
       </div>
       <div>
-        <div className="text-xl font-bold text-left my-5">
+        <div className="text-xl font-bold text-left my-5 text-[#11006F]">
           Thông tin sản phẩm
         </div>
         <div className="flex py-2 text-left font-bold flex">
@@ -153,9 +197,9 @@ const Payment = () => {
                   <div>Size áo - Số lượng: XS-02;XL-10</div>
                 </div>
               </div>
-              <div className="flex-1 text-right">12(cái)</div>
-              <div className="flex-1 text-right">
-                <i class="fa-solid fa-trash-can"></i>
+              <div className="">12(cái)</div>
+              <div className="">
+                <i className="fa-solid fa-trash-can"></i>
               </div>
               <div className="flex-1 text-right">685,500đ</div>
             </div>
@@ -217,7 +261,9 @@ const Payment = () => {
           </div>
         </div>
       </div>
-      <div className="w-32 py-3 my-2 ml-auto rounded-md bg-[#0C5DFF] text-white">Thanh toán</div>
+      <div className="w-32 py-3 my-2 ml-auto rounded-md bg-[#0C5DFF] text-white">
+        Thanh toán
+      </div>
     </div>
   );
 };

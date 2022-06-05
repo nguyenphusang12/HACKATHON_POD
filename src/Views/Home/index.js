@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Stage, Layer, Rect, Transformer } from "react-konva";
+import { Stage, Layer } from "react-konva";
 import ItemMenu from "Components/ItemMenu";
 import ArkworkImage from "Components/KonvaObject/ArkworkImage";
 import shirtIcon from "assets/image/Shape.png";
@@ -9,29 +9,12 @@ import colorIcon from "assets/image/Shape_1.png";
 import uploadIcon from "assets/image/Shape_4.png";
 import downloadIcon from "assets/image/Shape_5.png";
 import DetailMenu from "Components/DetailMenu";
-import { CirclePicker } from 'react-color';
 import html2canvas from "html2canvas";
 import Text from "Components/KonvaObject/Text";
+import { FONTS } from "data/font";
+import { useDispatch } from "react-redux";
+import { setTitlePage } from "Store";
 
-
-const initialRectangles = [
-  {
-    x: 150,
-    y: 150,
-    width: 100,
-    height: 100,
-    fill: "green",
-    id: "rect2",
-  },
-  {
-    x: 10,
-    y: 10,
-    width: 100,
-    height: 100,
-    fill: "red",
-    id: "rect1",
-  },
-];
 const LIST_BUTTONS_CONTROL = [
   {
     id: 1,
@@ -71,16 +54,20 @@ const LIST_BUTTONS_CONTROL = [
   },
 ];
 const Home = () => {
-  const [rectangles, setRectangles] = React.useState(initialRectangles);
+  const dispatch = useDispatch();
   const [selectedId, selectShape] = React.useState(null);
-  const [width, setWidth] = useState(700);  
-  const [height, setHeight] = useState(685);
   const [color, setColor] = useState("red");
   const [listButtons, setListButtons] = useState(LIST_BUTTONS_CONTROL);
   const [listImageDesign, setListImageDesign] = useState([]);
   const stageRef = React.useRef();
-  const containerRef = React.useRef();;
+  const containerRef = React.useRef();
   const [dragCurrent, setDragCurrent] = useState(null);
+  const [fontSelected, setFontSelected] = useState("Roboto");
+  const [bold, setBold] = useState(false);
+  const [italic, setItalic] = useState(false);
+  const [underline, setUndeline] = useState(false);
+  const [position, setPositon] = useState("left");
+  const [currentProduct, setCurrentProduct] = useState("assets/ao3.png");
   const checkDeselect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -97,68 +84,61 @@ const Home = () => {
       return item.id === id;
     });
   };
- 
-  const handleChangeColor = (color) => {
-    setColor(color.hex);
-  };
 
   const handleDownload = () => {
-    html2canvas(document.querySelector("#design-container")).then(canvas => {
-      const image = canvas.toDataURL("image/png", 1.0)
-      downloadImage(image, "design")
-  });
-};
-const downloadImage = (blob, fileName) => {
+    html2canvas(document.querySelector("#design-container")).then((canvas) => {
+      const image = canvas.toDataURL("image/png", 1.0);
+      downloadImage(image, "design");
+    });
+  };
+  const downloadImage = (blob, fileName) => {
     const fakeLink = window.document.createElement("a");
     fakeLink.style = "display:none;";
     fakeLink.download = fileName;
-    
+
     fakeLink.href = blob;
-    
+
     document.body.appendChild(fakeLink);
     fakeLink.click();
     document.body.removeChild(fakeLink);
-    
+
     fakeLink.remove();
   };
 
   const handleDeleteArtwork = () => {
-    const images = listImageDesign.filter(x => x.id != selectedId);
-    setListImageDesign(images)
-  }
+    const images = listImageDesign.filter((x) => x.id != selectedId);
+    setListImageDesign(images);
+  };
 
-  const handleChangeFont = () => {
-    
-  }
-  
+  const handleChangeFont = () => {};
+
   const handleDragArtwork = () => {
-    console.log(dragCurrent)
+    console.log(dragCurrent);
     switch (dragCurrent.type) {
       case "text":
-       let texts = listImageDesign.concat([
+        let texts = listImageDesign.concat([
           {
             id: new Date().getTime(),
             ...stageRef.current.getPointerPosition(),
             ...dragCurrent,
-            type: "text"
+            type: "text",
           },
-        ])
+        ]);
         if (dragCurrent.otherText) {
-          texts = texts.concat(
-            [
-              {
-                id: new Date().getTime() + 1,
-                x: stageRef.current.getPointerPosition().x,
-                y: stageRef.current.getPointerPosition().y + dragCurrent.fontSize + 5,
-                ...dragCurrent.otherText,
-                type: "text"
-              },
-            ]
-          )
+          texts = texts.concat([
+            {
+              id: new Date().getTime() + 1,
+              x: stageRef.current.getPointerPosition().x,
+              y:
+                stageRef.current.getPointerPosition().y +
+                dragCurrent.fontSize +
+                5,
+              ...dragCurrent.otherText,
+              type: "text",
+            },
+          ]);
         }
-        setListImageDesign(
-          texts
-        );
+        setListImageDesign(texts);
         return;
       case "artwork":
         setListImageDesign(
@@ -169,7 +149,7 @@ const downloadImage = (blob, fileName) => {
               width: 150,
               height: 150,
               src: dragCurrent.src,
-              type: "artwork"
+              type: "artwork",
             },
           ])
         );
@@ -177,9 +157,10 @@ const downloadImage = (blob, fileName) => {
       default:
         return;
     }
-
-    
-  }
+  };
+  useEffect(() => {
+    dispatch(setTitlePage("Thiết kế mẫu áo của bạn"))
+  }, []);
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
@@ -192,96 +173,211 @@ const downloadImage = (blob, fileName) => {
                 icon={item.icon}
                 handleClickMenu={index === 5 ? handleDownload : handleClickMenu}
                 item={item}
+              />
+              {item.isShow && (
+                <DetailMenu
+                  setCurrentProduct={setCurrentProduct}
+                  item={item}
+                  setColor={setColor}
+                  setDragCurrent={setDragCurrent}
                 />
-              {item.isShow && <DetailMenu item={item} setColor={setColor} setDragCurrent={setDragCurrent}/>}
+              )}
             </>
           ))}
         </div>
       </div>
       <div id="design-container" className="w-1/2 overflow-hidden  relative">
-
-         <div style={{ width: '100%'}}>
-            <img alt="" style={{top: 0, left: 0, width: width, background: color }} src="assets/ao3.png"/>
+        <div style={{ width: "100%" }}>
+          <img
+            alt=""
+            style={{ top: 0, left: 0, width: 700, background: color }}
+            src={`${currentProduct}`}
+          />
         </div>
         <div
-          id="page-container" 
-          style={{ position: "absolute", top: 0, left: 0, width:'100%'}}
-           onDrop={(e) => {
+          id="page-container"
+          style={{ position: "absolute", top: 0, left: 0, width: "100%" }}
+          onDrop={(e) => {
             e.preventDefault();
             // register event position
             stageRef.current.setPointersPositions(e);
             // add image
 
-            handleDragArtwork()
+            handleDragArtwork();
           }}
           onDragOver={(e) => e.preventDefault()}
         >
-        <Stage
-          width={window.innerWidth}
-          height={window.innerHeight}
-          onMouseDown={checkDeselect}
-          onTouchStart={checkDeselect}
-          ref={stageRef}
+          <Stage
+            width={window.innerWidth}
+            height={window.innerHeight}
+            onMouseDown={checkDeselect}
+            onTouchStart={checkDeselect}
+            ref={stageRef}
+          >
+            <Layer>
+              {listImageDesign.map((item, i) => {
+                switch (item.type) {
+                  case "text":
+                    return (
+                      <Text
+                        key={i}
+                        pageRef={containerRef}
+                        shapeProps={{
+                          ...item,
+                          fill: item.color,
+                          fontStyle: item.fontWeight
+                            ? item.fontWeight
+                            : "normal",
+                        }}
+                        isSelected={item.id === selectedId}
+                        onSelect={() => {
+                          setFontSelected(containerRef.current.fontFamily());
+                          setBold(
+                            containerRef.current.fontStyle().includes("bold")
+                          );
+                          setItalic(
+                            containerRef.current.fontStyle().includes("italic")
+                          );
+                          setUndeline(
+                            containerRef.current
+                              .fontStyle()
+                              .includes("underline")
+                          );
+                          selectShape(item.id);
+                        }}
+                        onChange={(newAttrs) => {
+                          const images = listImageDesign.slice();
+                          images[i] = newAttrs;
+                          setListImageDesign(images);
+                        }}
+                      />
+                    );
+                  case "artwork":
+                    return (
+                      <ArkworkImage
+                        key={i}
+                        shapeProps={item}
+                        isSelected={item.id === selectedId}
+                        onSelect={() => {
+                          selectShape(item.id);
+                        }}
+                        onChange={(newAttrs) => {
+                          const images = listImageDesign.slice();
+                          images[i] = newAttrs;
+                          setListImageDesign(images);
+                        }}
+                      />
+                    );
+                  default:
+                    return <></>;
+                }
+              })}
+            </Layer>
+          </Stage>
+        </div>
+        <div
+          className="absolute top-2 right-2 cursor-pointer"
+          onClick={handleDeleteArtwork}
         >
-
-
-
-          <Layer>
-            {listImageDesign.map((item, i) => {
-               switch (item.type) {
-                case "text":
+          Delete
+        </div>
+        {selectedId !== null && (
+          <div
+            className="absolute top-2 left-4 cursor-pointer flex"
+            onClick={handleChangeFont}
+          >
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">
+              <select defaultValue={fontSelected}>
+                {FONTS.map((x) => {
                   return (
-                    <Text
-                    key={i}
-                    pageRef={containerRef}
-                    shapeProps={{ ...item, fill: item.color }}
-                    isSelected={item.id === selectedId}
-                    onSelect={() => {
-                      selectShape(item.id);
-                    }}
-                    onChange={(newAttrs) => {
-                    const images = listImageDesign.slice();
-                    images[i] = newAttrs;
-                    setListImageDesign(images);
-                  }}
-                  />)
-                case "artwork":
-                  return (
-                    <ArkworkImage
-                    key={i}
-                    shapeProps={item}
-                    isSelected={item.id === selectedId}
-                    onSelect={() => {
-                      selectShape(item.id);
-                    }}
-                  onChange={(newAttrs) => {
-                    const images = listImageDesign.slice();
-                    images[i] = newAttrs;
-                    setListImageDesign(images);
-                  }}
-                  />)
-                default:
-                  return <></>;
-              }
-              
-            })}
-            
-            
-          </Layer>
-        </Stage>
-        </div>
-        <div className="absolute top-2 right-2 cursor-pointer" onClick={handleDeleteArtwork}>
-            Delete
-        </div>
-        {
-          selectedId !== null && 
-          <div className="absolute top-2 left-4 cursor-pointer flex" onClick={handleChangeFont}>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">B</div>
-            <div className="px-2 italic border-2 border-slate-50 bg-white text-black">I</div>
-            <div className="px-2 underline border-2 border-slate-50 bg-white text-black">U</div>
-        </div>
-        }
-        
+                    <option
+                      value={x}
+                      onChange={(e) => {
+                        setFontSelected(e.target.value);
+                      }}
+                    >
+                      {x}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: bold ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setBold(!bold);
+                bold
+                  ? containerRef.current.fontStyle("normal")
+                  : containerRef.current.fontStyle("bold");
+              }}
+            >
+              B
+            </div>
+            <div
+              className="px-2 italic border-2 border-slate-50 bg-white text-black"
+              style={{ background: italic ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setItalic(!italic);
+                italic
+                  ? containerRef.current.fontStyle("normal")
+                  : containerRef.current.fontStyle("italic");
+              }}
+            >
+              I
+            </div>
+            <div
+              className="px-2 underline border-2 border-slate-50 bg-white text-black"
+              style={{ background: underline ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setUndeline(!underline);
+                containerRef.current.fontStyle("underline");
+              }}
+            >
+              U
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "left" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "left" ? "" : "left");
+                containerRef.current.align("left");
+              }}
+            >
+              <i class="fa-solid fa-align-left"></i>
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "center" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "center" ? "" : "center");
+                containerRef.current.align("center");
+              }}
+            >
+              <i class="fa-solid fa-align-center"></i>
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "right" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "right" ? "" : "right");
+                containerRef.current.align("right");
+              }}
+            >
+              <i class="fa-solid fa-align-right"></i>
+            </div>
+            <div
+              className="px-2 font-bold border-2 border-slate-50 bg-white text-black"
+              style={{ background: position === "justify" ? "#CCC" : "#FFF" }}
+              onClick={() => {
+                setPositon(position === "justify" ? "" : "justify");
+                containerRef.current.align("justify");
+              }}
+            >
+              <i class="fa-solid fa-align-justify"></i>
+            </div>
+          </div>
+        )}
       </div>
       <div className="w-1/4 px-3">
         <div className="text-left w-full h-4/5 px-3">
@@ -308,7 +404,28 @@ const downloadImage = (blob, fileName) => {
                 </div>
               ))}
             </div>
-            <div className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500">Tính giá</div>
+            <div className="my-2 text-lg font-bold border border-[#dbdbdb] border-t-0 border-l-0 border-r-0">
+              Tổng cộng
+            </div>
+            <div className="flex justify-between my-1 ">
+              <div className="">Tiền áo:</div>
+              <div className="">135.000 đ</div>
+            </div>
+            <div className="flex justify-between my-1">
+              <div className="">Tiền in:</div>
+              <div className="">100.000 đ</div>
+            </div>
+            <div className="flex justify-between my-1">
+              <div className="">Tiền ảnh:</div>
+              <div className="">135.000 đ</div>
+            </div>
+            <div className="flex justify-between my-1">
+              <div className="">Tổng cộng:</div>
+              <div className="">135.000 đ</div>
+            </div>
+            <div className="w-full p-2 bg-sky-400 mt-3 rounded-md text-white text-center cursor-pointer active:bg-sky-500">
+              Tính giá
+            </div>
           </div>
         </div>
       </div>
@@ -319,4 +436,3 @@ const downloadImage = (blob, fileName) => {
 export default Home;
 
 const LIST_SIZE = ["XS", "S", "M", "L", "XXl", "XXXl"];
-

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import logoYody from "assets/image/Yody.svg";
+import logoYody from "assets/image/Yody.png";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Layout = () => {
+  const titlePage = useSelector((state) => state.product.titlePage);
   const [showModal, setShowModal] = useState(false);
   let navigate = useNavigate();
   const goHome = () => {
@@ -23,17 +25,17 @@ const Layout = () => {
       )}
       <div className="w-full relative h-20 flex items-center justify-center">
         <div className="absolute left-0 cursor-pointer" onClick={goHome}>
-          <img src={logoYody} alt="Yo" />
+          <img src={logoYody} alt="Yo" className="w-24"/>
         </div>
         <div className="text-2xl text-2xl font-bold">
-          Thiết kế mẫu áo của bạn
+          {titlePage}
         </div>
         <div className="absolute right-0 ">
           {showModal && (
             <div className="block border-[20px] border-l-transparent border-t-transparent border-r-transparent border-b-white absolute top-2 -right-2 z-[2]"></div>
           )}
           <div onClick={() => setShowModal(!showModal)}>
-            <i class="fa-solid fa-cart-shopping text-xl cursor-pointer"></i>
+            <i className="fa-solid fa-cart-shopping text-xl cursor-pointer"></i>
           </div>
           {showModal && (
             <div className="absolute top-[calc(100%+15px)] -right-3 w-96 max-h-96 px-2 pb-2 bg-white rounded-md z-10 overflow-auto">
@@ -53,7 +55,7 @@ const Layout = () => {
                 <div className="">
                   <div>685,500đ</div>
                   <div className="cursor-pointer active:opacity-80">
-                    <i class="fa-solid fa-trash-can"></i>
+                    <i className="fa-solid fa-trash-can"></i>
                   </div>
                 </div>
               </div>
