@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Stage, Layer, Rect, Transformer } from "react-konva";
+import React, { useState } from "react";
+import { Stage, Layer } from "react-konva";
 import ItemMenu from "Components/ItemMenu";
 import ArkworkImage from "Components/KonvaObject/ArkworkImage";
 import shirtIcon from "assets/image/Shape.png";
@@ -9,13 +9,9 @@ import colorIcon from "assets/image/Shape_1.png";
 import uploadIcon from "assets/image/Shape_4.png";
 import downloadIcon from "assets/image/Shape_5.png";
 import DetailMenu from "Components/DetailMenu";
-import { CirclePicker } from 'react-color';
 import html2canvas from "html2canvas";
 import Text from "Components/KonvaObject/Text";
 import { FONTS } from "data/font";
-import { current } from "@reduxjs/toolkit";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 const LIST_BUTTONS_CONTROL = [
   {
     id: 1,
@@ -87,7 +83,7 @@ const Home = () => {
  
 
   const handleDownload = () => {
-    html2canvas(document.querySelector("#design-container")).then(canvas => {
+    html2canvas(document.querySelector("#download-image")).then(canvas => {
       const image = canvas.toDataURL("image/png", 1.0)
       downloadImage(image, "design")
   });
@@ -107,16 +103,20 @@ const downloadImage = (blob, fileName) => {
   };
 
   const handleDeleteArtwork = () => {
-    const images = listImageDesign.filter(x => x.id != selectedId);
+    const images = listImageDesign.filter(x => x.id !== selectedId);
     setListImageDesign(images)
+    selectShape(null)
   }
 
   const handleChangeFont = () => {
     
   }
-  
+  const handleOnKeyDown = (e) => {
+    if (e.keyCode === 8 || e.keyCode === 46) {
+      handleDeleteArtwork()
+    } 
+  }
   const handleDragArtwork = () => {
-    console.log(dragCurrent)
     switch (dragCurrent.type) {
       case "text":
        let texts = listImageDesign.concat([
@@ -150,8 +150,8 @@ const downloadImage = (blob, fileName) => {
             {
               id: new Date().getTime(),
               ...stageRef.current.getPointerPosition(),
-              width: 150,
-              height: 150,
+              width: dragCurrent.useDefault ? 150 : dragCurrent.width,
+              height: dragCurrent.useDefault ? 150 : dragCurrent.height,
               src: dragCurrent.src,
               type: "artwork"
             },
@@ -161,30 +161,82 @@ const downloadImage = (blob, fileName) => {
       default:
         return;
     }
-
-    
+     
   }
+
+  const handleClickItem = (item) => {
+    var _item = JSON.parse(JSON.stringify(item)) 
+    switch (_item.type) {
+      case "text":
+       let texts = listImageDesign.concat([
+          {
+            id: new Date().getTime(),
+            x: 250, 
+            y: 200,
+            ..._item,
+            type: "text"
+          },
+        ])
+        if (_item.otherText) {
+          texts = texts.concat(
+            [
+              {
+                id: new Date().getTime() + 1,
+                x: 250, 
+                y: 200 + item.fontSize + 5,
+                ..._item.otherText,
+                type: "text"
+              },
+            ]
+          )
+        }
+        setListImageDesign(
+          texts
+        );
+        return;
+      case "artwork":
+        let list = listImageDesign.concat([
+          {
+            id: new Date().getTime(),
+            x: 250, 
+            y: 200,
+            width: _item.useDefault ? 150 : _item.width,
+            height: _item.useDefault ? 150 : _item.height,
+            src: _item.src,
+            type: "artwork"
+          }
+        ])
+        
+        setListImageDesign(
+            
+        );
+        console.log(list)
+        return;
+      default:
+        return;
+    }
+  }
+
   return (
     <div className="flex w-full">
       <div className="flex w-1/4">
         <div className="w-11/12 mx-auto px-2">
           {listButtons.map((item, index) => (
-            <>
+            <div key={index}>
               <ItemMenu
-                key={index}
                 title={item.title}
                 icon={item.icon}
                 handleClickMenu={index === 5 ? handleDownload : handleClickMenu}
                 item={item}
                 />
-              {item.isShow && <DetailMenu setCurrentProduct={setCurrentProduct} item={item} setColor={setColor} setDragCurrent={setDragCurrent}/>}
-            </>
+              {item.isShow && <DetailMenu setCurrentProduct={setCurrentProduct} item={item} setColor={setColor} setDragCurrent={setDragCurrent} handleClickItem={handleClickItem}/>}
+            </div>
           ))}
         </div>
       </div>
-      <div id="design-container" className="w-1/2 overflow-hidden  relative">
-
-         <div style={{ width: '100%'}}>
+      <div id="design-container" className="w-1/2 overflow-hidden relative">
+        <div id="download-image">
+        <div style={{ width: '100%'}}>
             <img alt="" style={{top: 0, left: 0, width: 700, background: color }} src={`${currentProduct}`}/>
         </div>
         <div
@@ -198,7 +250,10 @@ const downloadImage = (blob, fileName) => {
 
             handleDragArtwork()
           }}
+          
           onDragOver={(e) => e.preventDefault()}
+          onKeyDown={handleOnKeyDown}
+          tabIndex={-1}
         >
         <Stage
           width={window.innerWidth}
@@ -246,13 +301,15 @@ const downloadImage = (blob, fileName) => {
                   }}
                   />)
                 default:
-                  return <></>;
+                  return <div key={i}></div>;
               }
               
             })}
           </Layer>
         </Stage>
         </div>
+        </div>
+         
         <div className="absolute top-2 right-2 cursor-pointer" onClick={handleDeleteArtwork}>
             Delete
         </div>
@@ -260,18 +317,18 @@ const downloadImage = (blob, fileName) => {
           selectedId !== null && 
           <div className="absolute top-2 left-4 cursor-pointer flex" onClick={handleChangeFont}>
             <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black">
-            <select defaultValue={fontSelected}>
-              {FONTS.map(x => { return (<option value={x} onChange={(e) => {setFontSelected(e.target.value)}}>{x}</option>)
+            <select defaultValue={fontSelected} onChange={(e) => {setFontSelected(e.target.value);  containerRef.current.fontFamily(e.target.value)}}>
+              {FONTS.map((x, index) => { return (<option key={index} value={x} >{x}</option>)
               })}
             </select>
             </div>
             <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: bold?"#CCC":"#FFF" }} onClick={() => {setBold(!bold); bold ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("bold")}}>B</div>
             <div className="px-2 italic border-2 border-slate-50 bg-white text-black" style={{background: italic?"#CCC":"#FFF" }} onClick={() => {setItalic(!italic); italic ? containerRef.current.fontStyle("normal") : containerRef.current.fontStyle("italic")}}>I</div>
             <div className="px-2 underline border-2 border-slate-50 bg-white text-black" style={{background: underline?"#CCC":"#FFF" }} onClick={() => {setUndeline(!underline); containerRef.current.fontStyle("underline")}}>U</div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="left"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="left" ? "" : "left"); containerRef.current.align("left");}}><i class="fa-solid fa-align-left"></i></div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="center"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="center" ? "" : "center"); containerRef.current.align("center");}}><i class="fa-solid fa-align-center"></i></div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="right"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="right" ? "" : "right"); containerRef.current.align("right");}}><i class="fa-solid fa-align-right"></i></div>
-            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="justify"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="justify" ? "" : "justify"); containerRef.current.align("justify");}}><i class="fa-solid fa-align-justify"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="left"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="left" ? "" : "left"); containerRef.current.align("left");}}><i className="fa-solid fa-align-left"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="center"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="center" ? "" : "center"); containerRef.current.align("center");}}><i className="fa-solid fa-align-center"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="right"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="right" ? "" : "right"); containerRef.current.align("right");}}><i className="fa-solid fa-align-right"></i></div>
+            <div className="px-2 font-bold border-2 border-slate-50 bg-white text-black" style={{background: position==="justify"?"#CCC":"#FFF" }} onClick={() => {setPositon(position==="justify" ? "" : "justify"); containerRef.current.align("justify");}}><i className="fa-solid fa-align-justify"></i></div>
         </div>
         }
         
